@@ -608,29 +608,24 @@ class FRAVisionApp {
     document.getElementById("btn-close-claim-modal-2").onclick = () => this.claimModalController.closeModal();
     document.getElementById("btn-print-dossier").onclick = () => ExportService.printClaimDossier();
 
-    // Settings Modal & Gemini Key
+    // Settings Modal (data import) & read-only AI status indicator
     const btnOpenSettings = document.getElementById("btn-open-settings");
     const modalSettings = document.getElementById("modal-settings");
     const btnCloseSettings = document.getElementById("btn-close-settings-modal");
     const btnCancelSettings = document.getElementById("btn-cancel-settings");
     const btnSaveSettings = document.getElementById("btn-save-settings");
-    const inputGeminiKey = document.getElementById("input-gemini-key");
     const inputCustomDataset = document.getElementById("input-custom-dataset");
     const labelApiStatus = document.getElementById("label-api-status");
 
-    // Update API status label
-    const updateApiStatusLabel = () => {
-      if (this.aiService.hasLiveApiKey()) {
-        if (labelApiStatus) labelApiStatus.innerHTML = `<i class="fa-solid fa-bolt text-purple"></i> Gemini Live`;
-      } else {
-        if (labelApiStatus) labelApiStatus.innerHTML = `Gemini API`;
-      }
-    };
-    updateApiStatusLabel();
+    // Reflect whether a Gemini key is configured via .env (VITE_GEMINI_API_KEY) — no key is ever entered or shown in the UI
+    if (labelApiStatus) {
+      labelApiStatus.innerHTML = this.aiService.hasLiveApiKey()
+        ? `<i class="fa-solid fa-bolt text-purple"></i> Gemini Live`
+        : `Gemini API`;
+    }
 
     if (btnOpenSettings && modalSettings) {
       btnOpenSettings.onclick = () => {
-        if (inputGeminiKey) inputGeminiKey.value = this.aiService.apiKey || "";
         modalSettings.classList.add("active");
       };
     }
@@ -641,10 +636,6 @@ class FRAVisionApp {
 
     if (btnSaveSettings) {
       btnSaveSettings.onclick = () => {
-        const key = inputGeminiKey ? inputGeminiKey.value.trim() : "";
-        this.aiService.setApiKey(key);
-        updateApiStatusLabel();
-
         // Handle File upload if any
         const file = inputCustomDataset?.files?.[0];
         if (file) {

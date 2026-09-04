@@ -67,7 +67,7 @@
           <i class="fa-solid fa-robot"></i>
           <span>AI Assistant</span>
         </button>
-        <button id="btn-open-settings" class="sidebar-action-btn" title="Gemini API & Data Settings">
+        <button id="btn-open-settings" class="sidebar-action-btn" title="AI Status & Data Import">
           <i class="fa-solid fa-key"></i>
           <span id="label-api-status">API Key</span>
         </button>
@@ -820,23 +820,15 @@
       </div>
     </div>
 
-    <!-- Modal 4: Gemini Key & Data Sync Settings -->
+    <!-- Modal 4: Data Sync Settings -->
     <div id="modal-settings" class="modal-backdrop">
       <div class="modal-card">
         <div class="modal-header">
-          <h3><i class="fa-solid fa-gear text-cyan"></i> AI & Data Infrastructure Settings</h3>
+          <h3><i class="fa-solid fa-gear text-cyan"></i> Data Infrastructure Settings</h3>
           <button class="btn-close-modal" id="btn-close-settings-modal"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div class="modal-body">
           <div class="form-group">
-            <label for="input-gemini-key"><strong>Google Gemini API Key:</strong></label>
-            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">
-              Enables live Gemini Flash grounded anomaly audits, official memo drafting, and custom legal intelligence.
-            </p>
-            <input type="password" id="input-gemini-key" class="custom-select" style="width: 100%;" placeholder="AIzaSy..." />
-          </div>
-
-          <div class="form-group" style="margin-top: 14px;">
             <label><strong>Custom Dataset Import (data.gov.in / Bhuvan CSV or GeoJSON):</strong></label>
             <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">
               Upload any published FRA claim status CSV or MP Bhulekh/Bhuvan boundary GeoJSON to immediately parse and audit in the live engine.
@@ -848,7 +840,7 @@
         </div>
         <div class="modal-footer">
           <button class="btn btn-secondary" id="btn-cancel-settings">Cancel</button>
-          <button class="btn btn-primary" id="btn-save-settings"><i class="fa-solid fa-floppy-disk"></i> Save & Connect</button>
+          <button class="btn btn-primary" id="btn-save-settings"><i class="fa-solid fa-floppy-disk"></i> Save</button>
         </div>
       </div>
     </div>

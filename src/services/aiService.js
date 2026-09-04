@@ -6,18 +6,8 @@ import { FRA_LEGAL_KNOWLEDGE } from '../data/knowledgeBase.js';
 export class FRAAIService {
   constructor() {
     this.knowledgeBase = FRA_LEGAL_KNOWLEDGE;
-    const envKey = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) ? import.meta.env.VITE_GEMINI_API_KEY : "";
-    this.apiKey = localStorage.getItem("FRA_GEMINI_API_KEY") || envKey || "";
+    this.apiKey = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) ? import.meta.env.VITE_GEMINI_API_KEY : "";
     this.geminiModel = "gemini-3.6-flash"; // Current Gemini Flash model (verified reachable with live key)
-  }
-
-  setApiKey(key) {
-    this.apiKey = key.trim();
-    if (this.apiKey) {
-      localStorage.setItem("FRA_GEMINI_API_KEY", this.apiKey);
-    } else {
-      localStorage.removeItem("FRA_GEMINI_API_KEY");
-    }
   }
 
   hasLiveApiKey() {
