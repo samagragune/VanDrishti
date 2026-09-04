@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FRA-Vision AI | Decision Support System for Forest Rights Act Monitoring</title>
+  <meta name="description" content="AI-Powered Decision Support & WebGIS Monitoring System for Forest Rights Act (FRA 2006) claims tracking, anomaly detection, and tribal land governance." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+  <!-- Leaflet MarkerCluster -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Top Global Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-tree-deciduous"></i>
+          <span class="ai-badge">AI</span>
+        </div>
+        <div class="brand-titles">
+          <div class="brand-name">
+            <span>FRA-VISION</span>
+            <span class="version-tag">DSS v2.4</span>
+          </div>
+          <div class="brand-subtitle">Forest Rights Act (2006) Decision Support & Anomaly Monitoring Platform</div>
+        </div>
+      </div>
+
+      <div class="header-stats-ticker">
+        <div class="ticker-item">
+          <span class="ticker-label"><i class="fa-solid fa-layer-group"></i> Total Claims:</span>
+          <span class="ticker-value" id="hdr-total-claims">--</span>
+        </div>
+        <div class="ticker-divider"></div>
+        <div class="ticker-item">
+          <span class="ticker-label"><i class="fa-solid fa-certificate text-emerald"></i> Titles Conferred:</span>
+          <span class="ticker-value text-emerald" id="hdr-titles-granted">--</span>
+        </div>
+        <div class="ticker-divider"></div>
+        <div class="ticker-item">
+          <span class="ticker-label"><i class="fa-solid fa-triangle-exclamation text-amber"></i> Flagged Anomalies:</span>
+          <span class="ticker-value text-amber" id="hdr-anomalies-count">--</span>
+        </div>
+        <div class="ticker-divider"></div>
+        <div class="ticker-item">
+          <span class="ticker-label"><i class="fa-solid fa-ruler-combined text-cyan"></i> Forest Land Titled:</span>
+          <span class="ticker-value text-cyan" id="hdr-land-hectares">-- Ha</span>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <button id="btn-open-settings" class="btn btn-outline-primary" title="Configure Gemini AI Key & Data Sync">
+          <i class="fa-solid fa-key"></i>
+          <span id="label-api-status">Gemini API</span>
+        </button>
+        <button id="btn-export-report" class="btn btn-outline-primary" title="Export Analytical Audit Dossier">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <span>Export Audit</span>
+        </button>
+        <button id="btn-toggle-ai-brief" class="btn btn-ai-pulse" title="Generate AI Executive Briefing">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>AI Decision Brief</span>
+        </button>
+        <button id="btn-theme-toggle" class="btn btn-icon" title="Toggle Light/Dark Theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Navigation Bar -->
+    <nav class="main-nav">
+      <div class="nav-tabs">
+        <button class="nav-tab active" data-view="home-view">
+          <i class="fa-solid fa-house"></i>
+          <span>Home Portal</span>
+        </button>
+        <button class="nav-tab" data-view="map-view">
+          <i class="fa-solid fa-map-location-dot"></i>
+          <span>WebGIS Map Engine</span>
+        </button>
+        <button class="nav-tab" data-view="dashboard-view">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Executive Analytics</span>
+        </button>
+        <button class="nav-tab" data-view="anomaly-view">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>Anomaly Triage</span>
+          <span class="badge badge-warning" id="nav-anomaly-badge">0</span>
+        </button>
+        <button class="nav-tab" data-view="claims-table-view">
+          <i class="fa-solid fa-table-list"></i>
+          <span>Claims Registry</span>
+        </button>
+        <button class="nav-tab" data-view="ai-assistant-view">
+          <i class="fa-solid fa-brain"></i>
+          <span>FRA AI Copilot</span>
+        </button>
+      </div>
+
+      <!-- Quick State / District Selector Filter -->
+      <div class="global-filter-bar">
+        <div class="filter-group">
+          <label for="filter-state"><i class="fa-solid fa-landmark"></i> State:</label>
+          <select id="filter-state" class="custom-select">
+            <option value="ALL">All States Nationwide (14)</option>
+            <option value="Odisha">Odisha</option>
+            <option value="Chhattisgarh">Chhattisgarh</option>
+            <option value="Madhya Pradesh">Madhya Pradesh</option>
+            <option value="Maharashtra">Maharashtra</option>
+            <option value="Jharkhand">Jharkhand</option>
+            <option value="Kerala">Kerala</option>
+            <option value="Andhra Pradesh">Andhra Pradesh</option>
+            <option value="Telangana">Telangana</option>
+            <option value="Gujarat">Gujarat</option>
+            <option value="Rajasthan">Rajasthan</option>
+            <option value="Karnataka">Karnataka</option>
+            <option value="Tripura">Tripura</option>
+            <option value="West Bengal">West Bengal</option>
+            <option value="Assam">Assam</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-district"><i class="fa-solid fa-location-dot"></i> District:</label>
+          <select id="filter-district" class="custom-select">
+            <option value="ALL">All Districts (14)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-claim-type"><i class="fa-solid fa-tags"></i> Rights Type:</label>
+          <select id="filter-claim-type" class="custom-select">
+            <option value="ALL">All Types (IFR/CFR/CR)</option>
+            <option value="IFR">Individual (IFR)</option>
+            <option value="CFR">Community (CFR)</option>
+            <option value="CR">Community Rights (CR)</option>
+            <option value="CFRR">Resource Rights (CFRR)</option>
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label for="filter-status"><i class="fa-solid fa-spinner"></i> Stage:</label>
+          <select id="filter-status" class="custom-select">
+            <option value="ALL">All Stages</option>
+            <option value="Gram Sabha Verification">Gram Sabha</option>
+            <option value="SDLC Review">SDLC Review</option>
+            <option value="DLC Approval">DLC Approval</option>
+            <option value="Title Conferred">Title Conferred</option>
+            <option value="Rejected">Rejected</option>
+          </select>
+        </div>
+
+        <button id="btn-reset-filters" class="btn btn-icon-sm" title="Reset All Filters">
+          <i class="fa-solid fa-rotate-left"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- Main Workspace Views -->
+    <main class="main-content">
+      
+      <!-- VIEW 0: Government Portal Home & Nationwide Hub (MP Bhulekh Style) -->
+      <section id="home-view" class="workspace-view active">
+        <!-- Rendered dynamically by HomePortalView component -->
+      </section>
+
+      <!-- VIEW 1: WebGIS Map View -->
+      <section id="map-view" class="workspace-view">
+        <div class="map-layout">
+          
+          <!-- GIS Floating Control Sidebar -->
+          <aside class="map-sidebar">
+            <div class="sidebar-card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-sliders"></i> GIS Geospatial Layers</h3>
+                <span class="live-indicator"><span class="dot"></span> Active</span>
+              </div>
+              <div class="layer-control-list">
+                <label class="layer-toggle-item">
+                  <input type="checkbox" id="layer-districts" checked />
+                  <span class="layer-indicator district-border"></span>
+                  <span class="layer-name">District Administrative Boundaries</span>
+                </label>
+                <label class="layer-toggle-item">
+                  <input type="checkbox" id="layer-claims-ifr" checked />
+                  <span class="layer-indicator ifr-pin"></span>
+                  <span class="layer-name">Individual Forest Rights (IFR)</span>
+                </label>
+                <label class="layer-toggle-item">
+                  <input type="checkbox" id="layer-claims-cfr" checked />
+                  <span class="layer-indicator cfr-pin"></span>
+                  <span class="layer-name">Community Forest Rights (CFR)</span>
+                </label>
+                <label class="layer-toggle-item">
+                  <input type="checkbox" id="layer-anomalies" checked />
+                  <span class="layer-indicator anomaly-pin"></span>
+                  <span class="layer-name">Critical Anomaly Hotspots (<span id="map-anomaly-count">0</span>)</span>
+                </label>
+                <label class="layer-toggle-item">
+                  <input type="checkbox" id="layer-forest-cover" checked />
+                  <span class="layer-indicator forest-cover"></span>
+                  <span class="layer-name">Forest Density & Sanctuary Buffers</span>
+                </label>
+                <label class="layer-toggle-item">
+                  <input type="checkbox" id="layer-heatmap" />
+                  <span class="layer-indicator heatmap-grad"></span>
+                  <span class="layer-name">Pending Claims Density Heatmap</span>
+                </label>
+              </div>
+            </div>
+
+            <!-- Quick District Risk Score Card -->
+            <div class="sidebar-card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-crosshairs"></i> Selected District Diagnostic</h3>
+              </div>
+              <div id="district-quick-diagnostic" class="district-diagnostic-body">
+                <div class="empty-selection-state">
+                  <i class="fa-solid fa-hand-pointer"></i>
+                  <p>Click on any district polygon or claim pin on the map to inspect live AI metrics.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Real-Time Anomaly Highlights -->
+            <div class="sidebar-card">
+              <div class="card-header">
+                <h3><i class="fa-solid fa-triangle-exclamation text-amber"></i> Top Critical Alerts</h3>
+              </div>
+              <div id="quick-anomaly-feed" class="quick-anomaly-feed">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+          </aside>
+
+          <!-- Main Map Canvas -->
+          <div class="map-viewport-wrapper">
+            <div id="leaflet-map" class="map-canvas"></div>
+            
+            <!-- Map Floating Action Bar with Quick Filters -->
+            <div class="map-floating-tools">
+              <div class="map-quick-search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="map-quick-search-input" placeholder="Quick find district (e.g. Thane, Bastar, Kinnaur, Wayanad)..." />
+              </div>
+
+              <div class="map-filter-chips-group">
+                <button class="map-chip-btn active" data-map-filter="ALL">All Claims</button>
+                <button class="map-chip-btn chip-danger" data-map-filter="SPATIAL_OVERLAP"><i class="fa-solid fa-circle-exclamation"></i> Reserve Overlap</button>
+                <button class="map-chip-btn chip-warning" data-map-filter="SLA_DELAY"><i class="fa-solid fa-clock"></i> SLA >180d</button>
+                <button class="map-chip-btn chip-purple" data-map-filter="AREA_EXCEEDED"><i class="fa-solid fa-ruler-combined"></i> >4 Ha Ceiling</button>
+                <button class="map-chip-btn chip-orange" data-map-filter="OTFD_PROOF_GAP"><i class="fa-solid fa-id-card"></i> OTFD 75-Yr Gap</button>
+                <button class="map-chip-btn chip-success" data-map-filter="TITLE_CONFERRED"><i class="fa-solid fa-certificate"></i> Title Conferred</button>
+              </div>
+
+              <div class="map-tool-divider"></div>
+
+              <div class="map-tool-group">
+                <button id="btn-basemap-dark" class="map-tool-btn active" title="Dark Carto Basemap"><i class="fa-solid fa-moon"></i> Dark</button>
+                <button id="btn-basemap-satellite" class="map-tool-btn" title="Satellite Imagery"><i class="fa-solid fa-satellite"></i> Satellite</button>
+                <button id="btn-basemap-topo" class="map-tool-btn" title="Topographic / Terrain"><i class="fa-solid fa-mountain"></i> Terrain</button>
+              </div>
+              <div class="map-tool-divider"></div>
+              <button id="btn-fit-bounds" class="map-tool-btn" title="Reset Zoom to All of India"><i class="fa-solid fa-expand"></i> All India</button>
+            </div>
+
+            <!-- Map Legend -->
+            <div class="map-legend-card">
+              <div class="legend-title">GIS Symbology</div>
+              <div class="legend-grid">
+                <div class="legend-item"><span class="legend-dot dot-ifr"></span> IFR Claim (Individual)</div>
+                <div class="legend-item"><span class="legend-dot dot-cfr"></span> CFR / CFRR (Community)</div>
+                <div class="legend-item"><span class="legend-dot dot-title"></span> Title Deed Conferred</div>
+                <div class="legend-item"><span class="legend-dot dot-anomaly"></span> Critical AI Anomaly</div>
+                <div class="legend-item"><span class="legend-box box-dense-forest"></span> Dense Reserve Forest</div>
+                <div class="legend-item"><span class="legend-box box-sanctuary"></span> Protected Wildlife Buffer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 2: Executive Dashboard & Analytics -->
+      <section id="dashboard-view" class="workspace-view">
+        <div class="dashboard-container">
+          
+          <!-- Key Metrics Grid -->
+          <div class="metrics-grid">
+            <div class="kpi-card">
+              <div class="kpi-icon-box bg-blue-subtle text-blue">
+                <i class="fa-solid fa-file-signature"></i>
+              </div>
+              <div class="kpi-info">
+                <span class="kpi-title">Total Claims Registered</span>
+                <span class="kpi-value" id="kpi-total-claims">0</span>
+                <span class="kpi-subtext"><i class="fa-solid fa-arrow-up-right-dots text-emerald"></i> 100% digitalized across 6 states</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box bg-emerald-subtle text-emerald">
+                <i class="fa-solid fa-stamp"></i>
+              </div>
+              <div class="kpi-info">
+                <span class="kpi-title">Patta / Titles Distributed</span>
+                <span class="kpi-value" id="kpi-titles-granted">0</span>
+                <span class="kpi-subtext" id="kpi-recognition-rate"><i class="fa-solid fa-percent"></i> 0% recognition efficiency</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box bg-amber-subtle text-amber">
+                <i class="fa-solid fa-hourglass-half"></i>
+              </div>
+              <div class="kpi-info">
+                <span class="kpi-title">Pending Adjudication</span>
+                <span class="kpi-value" id="kpi-pending-claims">0</span>
+                <span class="kpi-subtext text-amber" id="kpi-sla-breached"><i class="fa-solid fa-clock"></i> 0 exceeding 180-day SLA</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box bg-rose-subtle text-rose">
+                <i class="fa-solid fa-ban"></i>
+              </div>
+              <div class="kpi-info">
+                <span class="kpi-title">Rejected Claims</span>
+                <span class="kpi-value" id="kpi-rejected-claims">0</span>
+                <span class="kpi-subtext text-rose" id="kpi-rejection-rate"><i class="fa-solid fa-chart-pie"></i> 0% gross rejection rate</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box bg-cyan-subtle text-cyan">
+                <i class="fa-solid fa-mountain-sun"></i>
+              </div>
+              <div class="kpi-info">
+                <span class="kpi-title">Forest Land Recognized</span>
+                <span class="kpi-value" id="kpi-land-hectares">0 Ha</span>
+                <span class="kpi-subtext"><i class="fa-solid fa-people-roof text-cyan"></i> Average: 2.14 Ha / beneficiary</span>
+              </div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-icon-box bg-purple-subtle text-purple">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+              </div>
+              <div class="kpi-info">
+                <span class="kpi-title">AI Flagged Anomalies</span>
+                <span class="kpi-value" id="kpi-anomalies">0</span>
+                <span class="kpi-subtext text-purple"><i class="fa-solid fa-bolt"></i> Requiring immediate DLC review</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analytical Charts Row -->
+          <div class="charts-row">
+            <div class="chart-card flex-2">
+              <div class="chart-header">
+                <div>
+                  <h3>State & District-Wise Progress & Title Disposal Velocity</h3>
+                  <p class="text-muted">Comparative breakdown of claims approved, pending at SDLC/DLC, and rejected</p>
+                </div>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chart-district-progress"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card flex-1">
+              <div class="chart-header">
+                <div>
+                  <h3>AI Anomaly Distribution</h3>
+                  <p class="text-muted">Breakdown by legal violation & procedural failure</p>
+                </div>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chart-anomaly-breakdown"></canvas>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts Row 2: Demographics & Tribal Community Recognition -->
+          <div class="charts-row">
+            <div class="chart-card flex-1">
+              <div class="chart-header">
+                <div>
+                  <h3>Tribal Demographic & PVTG Recognition</h3>
+                  <p class="text-muted">Distribution among Particularly Vulnerable Tribal Groups (PVTGs), STs & OTFDs</p>
+                </div>
+              </div>
+              <div class="chart-canvas-container">
+                <canvas id="chart-tribal-breakdown"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card flex-2">
+              <div class="chart-header">
+                <div>
+                  <h3>District Vulnerability & SLA Bottleneck Index</h3>
+                  <p class="text-muted">AI composite score based on backlog, rejection spikes, and spatial conflict density</p>
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="data-table" id="table-district-leaderboard">
+                  <thead>
+                    <tr>
+                      <th>District & State</th>
+                      <th>Total Claims</th>
+                      <th>Titles Issued</th>
+                      <th>Recognition %</th>
+                      <th>Avg Days Stuck</th>
+                      <th>High Anomaly Density</th>
+                      <th>AI Risk Tier</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VIEW 3: Anomaly Triage Queue -->
+      <section id="anomaly-view" class="workspace-view">
+        <div class="anomaly-container">
+          <div class="page-header-banner">
+            <div>
+              <h2><i class="fa-solid fa-shield-halved text-amber"></i> AI-Powered Anomaly Triage & Resolution Queue</h2>
+              <p class="text-muted">Automated algorithmic inspection against the Forest Rights Act 2006 statutory benchmarks, Section 4(6) land limits, and administrative SLA timelines.</p>
+            </div>
+            <div class="banner-actions">
+              <button id="btn-batch-resolve-dialog" class="btn btn-outline-warning">
+                <i class="fa-solid fa-list-check"></i> Batch Action Selected (<span id="batch-selected-count">0</span>)
+              </button>
+              <button id="btn-run-anomaly-scan" class="btn btn-primary">
+                <i class="fa-solid fa-rotate"></i> Re-Scan All Claims
+              </button>
+            </div>
+          </div>
+
+          <!-- Anomaly Category Filter Pills -->
+          <div class="anomaly-filters-bar">
+            <button class="pill-filter active" data-anomaly-type="ALL">All Anomalies (<span id="pill-count-all">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="SLA_DELAY"><i class="fa-solid fa-clock text-amber"></i> SLA Breach >180d (<span id="pill-count-sla">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="SPATIAL_OVERLAP"><i class="fa-solid fa-draw-polygon text-rose"></i> Spatial Overlap / Conflict (<span id="pill-count-overlap">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="AREA_EXCEEDED"><i class="fa-solid fa-ruler-combined text-purple"></i> Area > 4 Ha Statutory Limit (<span id="pill-count-area">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="HIGH_REJECTION"><i class="fa-solid fa-ban text-rose"></i> Abnormal Rejection Outlier (<span id="pill-count-rejection">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="OTFD_PROOF_GAP"><i class="fa-solid fa-file-circle-xmark text-cyan"></i> OTFD 75-Yr Proof Gap (<span id="pill-count-otfd">0</span>)</button>
+          </div>
+
+          <!-- Anomaly Table -->
+          <div class="anomaly-table-card">
+            <div class="table-responsive">
+              <table class="data-table" id="table-anomaly-queue">
+                <thead>
+                  <tr>
+                    <th width="40"><input type="checkbox" id="check-all-anomalies" /></th>
+                    <th>Claim ID</th>
+                    <th>Applicant / Community</th>
+                    <th>District, State</th>
+                    <th>Tribe Category</th>
+                    <th>Claim Type & Land (Ha)</th>
+                    <th>Current Stage</th>
+                    <th>Anomaly Category & Severity</th>
+                    <th>AI Diagnostic Finding</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-anomalies">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 4: Claims Registry Table -->
+      <section id="claims-table-view" class="workspace-view">
+        <div class="claims-registry-container">
+          <div class="page-header-banner">
+            <div>
+              <h2><i class="fa-solid fa-table-list text-cyan"></i> Comprehensive FRA Claims Master Registry</h2>
+              <p class="text-muted">Search, filter, and inspect all individual and community forest land claims with full audit trail history.</p>
+            </div>
+            <div class="banner-actions">
+              <div class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="input-search-claims" placeholder="Search by Claim ID, Applicant, Gram Sabha, Tribe..." />
+              </div>
+              <button id="btn-export-claims-csv" class="btn btn-outline-primary">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+            </div>
+          </div>
+
+          <div class="claims-table-card">
+            <div class="table-responsive">
+              <table class="data-table" id="table-claims-master">
+                <thead>
+                  <tr>
+                    <th>Claim ID</th>
+                    <th>Applicant Name</th>
+                    <th>Tribe / OTFD</th>
+                    <th>Type</th>
+                    <th>Area (Ha)</th>
+                    <th>Gram Sabha / Panchayat</th>
+                    <th>District & State</th>
+                    <th>Filed Date</th>
+                    <th>Stage & Status</th>
+                    <th>Anomaly Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-claims-master">
+                  <!-- Injected via JavaScript -->
+                </tbody>
+              </table>
+            </div>
+            <div class="table-pagination">
+              <span id="pagination-info">Showing 1-25 of 500 records</span>
+              <div class="pagination-controls">
+                <button id="btn-prev-page" class="btn btn-icon-sm" disabled><i class="fa-solid fa-chevron-left"></i></button>
+                <span id="current-page-num" class="page-num">1</span>
+                <button id="btn-next-page" class="btn btn-icon-sm"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW 5: FRA AI Copilot & Decision Center -->
+      <section id="ai-assistant-view" class="workspace-view">
+        <div class="ai-copilot-container">
+          <div class="ai-sidebar">
+            <div class="copilot-profile">
+              <div class="ai-avatar">
+                <i class="fa-solid fa-brain"></i>
+              </div>
+              <div class="ai-avatar-info">
+                <h3>FRA Decision Copilot</h3>
+                <span class="status-online"><i class="fa-solid fa-circle"></i> Grounded in FRA 2006 Rules</span>
+              </div>
+            </div>
+
+            <div class="ai-prompts-section">
+              <span class="section-subheading">Quick Inquiry Templates:</span>
+              <button class="ai-preset-chip" data-prompt="Generate a high-level executive decision brief summarizing top bottlenecks across all districts.">
+                <i class="fa-solid fa-chart-pie"></i> Executive Briefing on Bottlenecks
+              </button>
+              <button class="ai-preset-chip" data-prompt="Which districts have the highest rejection rates and what are the primary procedural reasons under FRA 2006?">
+                <i class="fa-solid fa-ban"></i> Rejection Outlier Analysis
+              </button>
+              <button class="ai-preset-chip" data-prompt="What are the statutory requirements and evidence needed for Other Traditional Forest Dwellers (OTFD) under Section 2(o)?">
+                <i class="fa-solid fa-scale-balanced"></i> OTFD 75-Year Evidence Rules
+              </button>
+              <button class="ai-preset-chip" data-prompt="Identify all claims exceeding the 4 Hectares statutory limit under Section 4(6) and propose mitigation.">
+                <i class="fa-solid fa-ruler-combined"></i> Section 4(6) Area Violations
+              </button>
+              <button class="ai-preset-chip" data-prompt="Draft an official administrative directive to the Sub-Divisional Level Committee (SDLC) regarding pending SLA breaches.">
+                <i class="fa-solid fa-file-contract"></i> Draft SDLC Acceleration Notice
+              </button>
+            </div>
+
+            <div class="ai-stats-summary-card">
+              <h4>System Context Status</h4>
+              <div class="context-item">
+                <span>Active District Filter:</span>
+                <strong id="ai-ctx-district">All Districts</strong>
+              </div>
+              <div class="context-item">
+                <span>Active Anomalies:</span>
+                <strong id="ai-ctx-anomalies" class="text-amber">--</strong>
+              </div>
+              <div class="context-item">
+                <span>Knowledge Base:</span>
+                <strong>FRA 2006 + 2012 Amendment Rules</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="ai-chat-interface">
+            <div class="chat-messages" id="chat-messages-container">
+              <div class="chat-message system-message">
+                <div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>
+                <div class="msg-bubble">
+                  <strong>Greetings, Nodal Officer.</strong> I am your AI Decision Support Specialist for Forest Rights Act monitoring. I continuously evaluate geospatial boundaries, statutory limits, and multi-tier review pipelines. Ask me any question, request a district brief, or select one of the suggested inquiries.
+                </div>
+              </div>
+            </div>
+
+            <div class="chat-input-wrapper">
+              <textarea id="ai-chat-input" placeholder="Ask about FRA claim anomalies, legal guidelines, district statistics, or draft an official directive..." rows="2"></textarea>
+              <button id="btn-send-ai-message" class="btn btn-primary btn-send">
+                <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Modals & Drawers -->
+
+    <!-- Modal 1: Claim Inspector & Lifecycle Timeline -->
+    <div id="modal-claim-inspector" class="modal-backdrop">
+      <div class="modal-card modal-lg">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge badge-primary" id="modal-claim-type">IFR</span>
+            <h2 id="modal-claim-id">CLM-OD-MAY-1042</h2>
+            <span class="text-muted" id="modal-claim-applicant">Applicant Name</span>
+          </div>
+          <button class="btn-close-modal" id="btn-close-claim-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="modal-body">
+          <!-- 4-Stage Lifecycle Timeline -->
+          <div class="lifecycle-timeline">
+            <div class="timeline-step step-complete" id="step-gram-sabha">
+              <div class="step-circle"><i class="fa-solid fa-check"></i></div>
+              <div class="step-label">
+                <strong>1. Gram Sabha</strong>
+                <span class="step-date" id="step-date-gs">Verified</span>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step step-active" id="step-sdlc">
+              <div class="step-circle"><i class="fa-solid fa-spinner fa-spin"></i></div>
+              <div class="step-label">
+                <strong>2. SDLC Review</strong>
+                <span class="step-date" id="step-date-sdlc">In Progress</span>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step" id="step-dlc">
+              <div class="step-circle"><i class="fa-solid fa-landmark"></i></div>
+              <div class="step-label">
+                <strong>3. DLC Sanction</strong>
+                <span class="step-date" id="step-date-dlc">Pending</span>
+              </div>
+            </div>
+            <div class="timeline-connector"></div>
+            <div class="timeline-step" id="step-patta">
+              <div class="step-circle"><i class="fa-solid fa-certificate"></i></div>
+              <div class="step-label">
+                <strong>4. Title Deed</strong>
+                <span class="step-date" id="step-date-title">Pending</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-grid-2col">
+            <!-- Col 1: Claim Attributes & Spatial Coordinates -->
+            <div class="inspector-section">
+              <h4><i class="fa-solid fa-id-card"></i> Beneficiary & Parcel Details</h4>
+              <div class="detail-props-grid">
+                <div class="prop-item"><span class="prop-k">Applicant:</span> <span class="prop-v" id="insp-applicant">--</span></div>
+                <div class="prop-item"><span class="prop-k">Tribe / Category:</span> <span class="prop-v" id="insp-tribe">--</span></div>
+                <div class="prop-item"><span class="prop-k">Claim Type:</span> <span class="prop-v" id="insp-type">--</span></div>
+                <div class="prop-item"><span class="prop-k">Claimed Area:</span> <span class="prop-v" id="insp-area">-- Ha</span></div>
+                <div class="prop-item"><span class="prop-k">Gram Sabha / GP:</span> <span class="prop-v" id="insp-panchayat">--</span></div>
+                <div class="prop-item"><span class="prop-k">District & State:</span> <span class="prop-v" id="insp-location">--</span></div>
+                <div class="prop-item"><span class="prop-k">Forest Survey No:</span> <span class="prop-v" id="insp-survey">--</span></div>
+                <div class="prop-item"><span class="prop-k">GPS Coordinates:</span> <span class="prop-v" id="insp-coords">--</span></div>
+                <div class="prop-item"><span class="prop-k">Submission Date:</span> <span class="prop-v" id="insp-date">--</span></div>
+                <div class="prop-item"><span class="prop-k">Days in Pipeline:</span> <span class="prop-v" id="insp-days">-- days</span></div>
+              </div>
+
+              <div class="satellite-preview-card">
+                <div class="sat-preview-header">
+                  <span><i class="fa-solid fa-satellite"></i> GIS Satellite Plot Preview</span>
+                  <span class="sat-ndvi">NDVI: 0.72 (Dense Canopy)</span>
+                </div>
+                <div id="inspector-mini-map" class="inspector-mini-map"></div>
+              </div>
+            </div>
+
+            <!-- Col 2: AI Anomaly Diagnostic & Decision Actions -->
+            <div class="inspector-section">
+              <h4><i class="fa-solid fa-brain text-purple"></i> AI Anomaly Diagnostic & Evidence Audit</h4>
+              <div id="insp-anomaly-box" class="inspector-anomaly-card">
+                <!-- Injected via JavaScript -->
+              </div>
+
+              <div class="evidence-checklist">
+                <h5>Statutory Evidence Verification (Rule 11/12)</h5>
+                <label class="check-item"><input type="checkbox" checked disabled /> Gram Sabha Resolution with 50% Quorum (1/3rd Women)</label>
+                <label class="check-item" id="chk-frc"><input type="checkbox" checked disabled /> Forest Rights Committee (FRC) Field Verification Report</label>
+                <label class="check-item" id="chk-elder"><input type="checkbox" checked disabled /> Elder Statements / Oral History Testimonials</label>
+                <label class="check-item" id="chk-boundary"><input type="checkbox" checked disabled /> Physical Boundary Demarcation & GPS Trace</label>
+                <label class="check-item" id="chk-otfd-proof"><input type="checkbox" disabled /> 75-Year (3 Generations) Pre-13 Dec 2005 Proof (OTFD)</label>
+              </div>
+
+              <div class="officer-actions-panel">
+                <h5>Nodal Officer Decision & Action Dispatch</h5>
+                <div class="action-buttons-row">
+                  <button id="btn-action-approve" class="btn btn-emerald"><i class="fa-solid fa-check"></i> Grant Title / Sanction</button>
+                  <button id="btn-action-resurvey" class="btn btn-amber"><i class="fa-solid fa-compass-drafting"></i> Request Re-Survey</button>
+                  <button id="btn-action-escalate" class="btn btn-purple"><i class="fa-solid fa-arrow-up-right-from-square"></i> Escalate to DLC</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-outline-secondary" id="btn-print-dossier"><i class="fa-solid fa-print"></i> Print Official Claim Dossier</button>
+          <button class="btn btn-secondary" id="btn-close-claim-modal-2">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 2: AI Executive Decision Briefing -->
+    <div id="modal-ai-briefing" class="modal-backdrop">
+      <div class="modal-card modal-lg">
+        <div class="modal-header">
+          <div class="modal-title-group">
+            <span class="badge badge-purple"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Generated</span>
+            <h2>State-Wise FRA Governance & Decision Support Brief</h2>
+          </div>
+          <button class="btn-close-modal" id="btn-close-briefing-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body" id="ai-briefing-content">
+          <!-- Dynamic generated content -->
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-outline-primary" id="btn-copy-brief"><i class="fa-solid fa-copy"></i> Copy Briefing</button>
+          <button class="btn btn-primary" id="btn-download-brief-pdf"><i class="fa-solid fa-file-pdf"></i> Download Official Memo (PDF)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 3: Batch Action Confirmation -->
+    <div id="modal-batch-action" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-list-check text-amber"></i> Batch Mitigation for Selected Claims</h3>
+          <button class="btn-close-modal" id="btn-close-batch-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <p>You have selected <strong id="batch-modal-count" class="text-amber">0</strong> claims for bulk administrative intervention.</p>
+          <div class="form-group">
+            <label for="select-batch-action">Select Administrative Directive:</label>
+            <select id="select-batch-action" class="custom-select">
+              <option value="EXPEDITE_SDLC">Issue SLA Expedite Notice to Sub-Divisional Level Committee</option>
+              <option value="JOINT_RESURVEY">Order Joint Forest-Revenue Boundary Re-Survey</option>
+              <option value="REQUEST_SPEAKING_ORDER">Require Reasoned Speaking Order for Rejection Review</option>
+              <option value="BULK_DLC_SANCTION">Forward to District Level Committee for Final Patta Sanction</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="textarea-batch-notes">Official Note / Order Reference:</label>
+            <textarea id="textarea-batch-notes" class="custom-textarea" rows="3" placeholder="Enter MoTA/SDA circular or memo number..."></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-batch">Cancel</button>
+          <button class="btn btn-primary" id="btn-confirm-batch-action"><i class="fa-solid fa-paper-plane"></i> Execute Directive</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal 4: Gemini Key & Data Sync Settings -->
+    <div id="modal-settings" class="modal-backdrop">
+      <div class="modal-card">
+        <div class="modal-header">
+          <h3><i class="fa-solid fa-gear text-cyan"></i> AI & Data Infrastructure Settings</h3>
+          <button class="btn-close-modal" id="btn-close-settings-modal"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="input-gemini-key"><strong>Google Gemini API Key:</strong></label>
+            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">
+              Enables live Gemini 2.5/1.5 Flash grounded anomaly audits, official memo drafting, and custom legal intelligence.
+            </p>
+            <input type="password" id="input-gemini-key" class="custom-select" style="width: 100%;" placeholder="AIzaSy..." />
+          </div>
+
+          <div class="form-group" style="margin-top: 14px;">
+            <label><strong>Custom Dataset Import (data.gov.in / Bhuvan CSV or GeoJSON):</strong></label>
+            <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">
+              Upload any published FRA claim status CSV or MP Bhulekh/Bhuvan boundary GeoJSON to immediately parse and audit in the live engine.
+            </p>
+            <input type="file" id="input-custom-dataset" accept=".csv,.json,.geojson" style="font-size: 0.8rem; width: 100%;" />
+          </div>
+
+          <div id="data-sync-status" style="font-size: 0.775rem; color: var(--emerald-primary); margin-top: 8px;"></div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" id="btn-cancel-settings">Cancel</button>
+          <button class="btn btn-primary" id="btn-save-settings"><i class="fa-solid fa-floppy-disk"></i> Save & Connect</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Leaflet and Plugins via CDN -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+  
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
