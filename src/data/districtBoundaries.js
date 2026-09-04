@@ -104,6 +104,66 @@ export const DISTRICT_REGIONS = [
     polygon: [[23.15, 74.00], [23.10, 74.55], [22.45, 74.50], [22.40, 73.90], [23.15, 74.00]]
   },
   {
+    name: "Tapi",
+    state: "Gujarat",
+    code: "GJ-TAP",
+    center: [21.25, 73.55],
+    zoom: 9,
+    forestAreaHa: 135000,
+    tribalPct: 84.2,
+    pvtgGroups: ["Gamit", "Vasava", "Chaudhri", "Kotwalia"],
+    bounds: [[20.90, 73.15], [20.90, 73.95], [21.60, 73.95], [21.60, 73.15]],
+    polygon: [[21.55, 73.25], [21.50, 73.90], [21.00, 73.85], [20.95, 73.20], [21.55, 73.25]]
+  },
+  {
+    name: "Sabarkantha",
+    state: "Gujarat",
+    code: "GJ-SAB",
+    center: [23.68, 73.15],
+    zoom: 9,
+    forestAreaHa: 112000,
+    tribalPct: 48.6,
+    pvtgGroups: ["Bhil", "Dungri Garasia", "Kathodi"],
+    bounds: [[23.30, 72.80], [23.30, 73.60], [24.10, 73.60], [24.10, 72.80]],
+    polygon: [[24.05, 73.00], [24.00, 73.55], [23.40, 73.50], [23.35, 72.85], [24.05, 73.00]]
+  },
+  {
+    name: "Valsad",
+    state: "Gujarat",
+    code: "GJ-VAL",
+    center: [20.55, 72.95],
+    zoom: 9,
+    forestAreaHa: 98000,
+    tribalPct: 54.8,
+    pvtgGroups: ["Dhodia", "Warli", "Koli Dhor", "Kathodi"],
+    bounds: [[20.15, 72.70], [20.15, 73.30], [20.90, 73.30], [20.90, 72.70]],
+    polygon: [[20.85, 72.80], [20.80, 73.25], [20.20, 73.20], [20.20, 72.75], [20.85, 72.80]]
+  },
+  {
+    name: "Junagadh",
+    state: "Gujarat",
+    code: "GJ-JUN",
+    center: [21.52, 70.45],
+    zoom: 9,
+    forestAreaHa: 176000,
+    tribalPct: 8.5,
+    pvtgGroups: ["Siddi (PVTG - Gir Forest)", "Rabari Pastoralist", "Bharwad"],
+    bounds: [[21.10, 69.90], [21.10, 70.90], [21.90, 70.90], [21.90, 69.90]],
+    polygon: [[21.85, 70.10], [21.80, 70.85], [21.20, 70.80], [21.15, 70.00], [21.85, 70.10]]
+  },
+  {
+    name: "Kutch",
+    state: "Gujarat",
+    code: "GJ-KUT",
+    center: [23.40, 69.80],
+    zoom: 8,
+    forestAreaHa: 220000,
+    tribalPct: 9.2,
+    pvtgGroups: ["Maldhari Pastoralist", "Rabari", "Koli Traditional"],
+    bounds: [[22.80, 68.50], [22.80, 71.00], [24.40, 71.00], [24.40, 68.50]],
+    polygon: [[24.30, 68.80], [24.25, 70.80], [23.10, 70.70], [22.90, 69.20], [23.40, 68.60], [24.30, 68.80]]
+  },
+  {
     name: "Sanguem",
     state: "Goa",
     code: "GA-SAN",
@@ -723,7 +783,7 @@ export const DISTRICT_REGIONS = [
     tribalPct: 70.9,
     pvtgGroups: ["Dimasa", "Zeme Naga", "Hmar", "Kuki"],
     bounds: [[24.90, 92.40], [24.90, 93.40], [25.80, 93.40], [25.80, 92.40]],
-    polygon: [[25.75, 92.55], [25.70, 93.30], [25.00, 93.25], [24.95, 25.50], [25.75, 92.55]]
+    polygon: [[25.75, 92.55], [25.70, 93.30], [25.00, 93.25], [24.95, 92.50], [25.75, 92.55]]
   },
   {
     name: "Dhalai",

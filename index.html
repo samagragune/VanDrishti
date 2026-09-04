@@ -3,19 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FRA-Vision AI | Decision Support System for Forest Rights Act Monitoring</title>
-  <meta name="description" content="AI-Powered Decision Support & WebGIS Monitoring System for Forest Rights Act (FRA 2006) claims tracking, anomaly detection, and tribal land governance." />
+  <title>VanDrishti | People • Forests • Fairer Futures | FRA Decision Support & Cadastral WebGIS</title>
+  <meta name="description" content="VanDrishti: AI-Powered Geospatial Cadastral Intelligence & Statutory Anomaly Monitoring Platform for the Forest Rights Act (FRA 2006)." />
+
+  <link rel="icon" type="image/png" href="/vandrishti-logo.png" />
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-  <!-- Leaflet MarkerCluster -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -23,152 +19,138 @@
   <link rel="stylesheet" href="/src/style.css" />
 </head>
 <body>
-  <div id="app">
-    <!-- Top Global Header -->
-    <header class="app-header">
-      <div class="header-brand">
-        <div class="brand-logo">
-          <i class="fa-solid fa-tree-deciduous"></i>
-          <span class="ai-badge">AI</span>
+  <div id="app" class="app-layout">
+    <!-- Slim Left Navigation Sidebar -->
+    <aside class="app-sidebar">
+      <div class="sidebar-top">
+        <div class="sidebar-brand-icon" title="VanDrishti Decision Support">
+          <img src="/vandrishti-logo.png" alt="VanDrishti Logo" />
         </div>
-        <div class="brand-titles">
-          <div class="brand-name">
-            <span>FRA-VISION</span>
-            <span class="version-tag">DSS v2.4</span>
-          </div>
-          <div class="brand-subtitle">Forest Rights Act (2006) Decision Support & Anomaly Monitoring Platform</div>
+        <div class="sidebar-brand-name">
+          <span>VanDrishti</span>
+          <span class="sidebar-version-pill">v2.5</span>
         </div>
       </div>
 
-      <div class="header-stats-ticker">
-        <div class="ticker-item">
-          <span class="ticker-label"><i class="fa-solid fa-layer-group"></i> Total Claims:</span>
-          <span class="ticker-value" id="hdr-total-claims">--</span>
-        </div>
-        <div class="ticker-divider"></div>
-        <div class="ticker-item">
-          <span class="ticker-label"><i class="fa-solid fa-certificate text-emerald"></i> Titles Conferred:</span>
-          <span class="ticker-value text-emerald" id="hdr-titles-granted">--</span>
-        </div>
-        <div class="ticker-divider"></div>
-        <div class="ticker-item">
-          <span class="ticker-label"><i class="fa-solid fa-triangle-exclamation text-amber"></i> Flagged Anomalies:</span>
-          <span class="ticker-value text-amber" id="hdr-anomalies-count">--</span>
-        </div>
-        <div class="ticker-divider"></div>
-        <div class="ticker-item">
-          <span class="ticker-label"><i class="fa-solid fa-ruler-combined text-cyan"></i> Forest Land Titled:</span>
-          <span class="ticker-value text-cyan" id="hdr-land-hectares">-- Ha</span>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <button id="btn-open-settings" class="btn btn-outline-primary" title="Configure Gemini AI Key & Data Sync">
-          <i class="fa-solid fa-key"></i>
-          <span id="label-api-status">Gemini API</span>
-        </button>
-        <button id="btn-export-report" class="btn btn-outline-primary" title="Export Analytical Audit Dossier">
-          <i class="fa-solid fa-file-arrow-down"></i>
-          <span>Export Audit</span>
-        </button>
-        <button id="btn-toggle-ai-brief" class="btn btn-ai-pulse" title="Generate AI Executive Briefing">
-          <i class="fa-solid fa-wand-magic-sparkles"></i>
-          <span>AI Decision Brief</span>
-        </button>
-        <button id="btn-theme-toggle" class="btn btn-icon" title="Toggle Light/Dark Theme">
-          <i class="fa-solid fa-moon"></i>
-        </button>
-      </div>
-    </header>
-
-    <!-- Main Navigation Bar -->
-    <nav class="main-nav">
-      <div class="nav-tabs">
-        <button class="nav-tab active" data-view="home-view">
+      <!-- Navigation Tab Icons & Names -->
+      <nav class="sidebar-nav">
+        <button class="nav-tab active" data-view="home-view" title="Home Portal">
           <i class="fa-solid fa-house"></i>
-          <span>Home Portal</span>
+          <span>Home</span>
         </button>
-        <button class="nav-tab" data-view="map-view">
+        <button class="nav-tab" data-view="map-view" title="WebGIS Satellite Map">
           <i class="fa-solid fa-map-location-dot"></i>
-          <span>WebGIS Map Engine</span>
+          <span>Map</span>
         </button>
-        <button class="nav-tab" data-view="dashboard-view">
+        <button class="nav-tab" data-view="dashboard-view" title="Executive Analytics">
           <i class="fa-solid fa-chart-line"></i>
-          <span>Executive Analytics</span>
+          <span>Analytics</span>
         </button>
-        <button class="nav-tab" data-view="anomaly-view">
+        <button class="nav-tab" data-view="anomaly-view" title="Anomaly Triage Queue">
           <i class="fa-solid fa-shield-halved"></i>
-          <span>Anomaly Triage</span>
-          <span class="badge badge-warning" id="nav-anomaly-badge">0</span>
+          <span>Triage</span>
+          <span class="badge badge-warning sidebar-badge" id="nav-anomaly-badge">0</span>
         </button>
-        <button class="nav-tab" data-view="claims-table-view">
+        <button class="nav-tab" data-view="claims-table-view" title="Claims Master Registry">
           <i class="fa-solid fa-table-list"></i>
-          <span>Claims Registry</span>
+          <span>Registry</span>
         </button>
-        <button class="nav-tab" data-view="ai-assistant-view">
+        <button class="nav-tab" data-view="ai-assistant-view" title="AI Legal Copilot">
           <i class="fa-solid fa-brain"></i>
-          <span>FRA AI Copilot</span>
+          <span>AI Copilot</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Bottom Utilities -->
+      <div class="sidebar-bottom">
+        <button id="btn-toggle-sidebar-agent" class="sidebar-action-btn btn-ai-pulse" title="VanDrishti AI Assistant">
+          <i class="fa-solid fa-robot"></i>
+          <span>AI Assistant</span>
+        </button>
+        <button id="btn-open-settings" class="sidebar-action-btn" title="Gemini API & Data Settings">
+          <i class="fa-solid fa-key"></i>
+          <span id="label-api-status">API Key</span>
+        </button>
+        <button id="btn-export-report" class="sidebar-action-btn" title="Export Audit Report">
+          <i class="fa-solid fa-file-arrow-down"></i>
+          <span>Export</span>
+        </button>
+        <button id="btn-theme-toggle" class="sidebar-action-btn" title="Toggle Light/Dark Theme">
+          <i class="fa-solid fa-moon"></i>
+          <span>Theme</span>
         </button>
       </div>
+    </aside>
 
-      <!-- Quick State / District Selector Filter -->
-      <div class="global-filter-bar">
-        <div class="filter-group">
-          <label for="filter-state"><i class="fa-solid fa-landmark"></i> State:</label>
-          <select id="filter-state" class="custom-select">
-            <option value="ALL">All States Nationwide (14)</option>
-            <option value="Odisha">Odisha</option>
-            <option value="Chhattisgarh">Chhattisgarh</option>
-            <option value="Madhya Pradesh">Madhya Pradesh</option>
-            <option value="Maharashtra">Maharashtra</option>
-            <option value="Jharkhand">Jharkhand</option>
-            <option value="Kerala">Kerala</option>
-            <option value="Andhra Pradesh">Andhra Pradesh</option>
-            <option value="Telangana">Telangana</option>
-            <option value="Gujarat">Gujarat</option>
-            <option value="Rajasthan">Rajasthan</option>
-            <option value="Karnataka">Karnataka</option>
-            <option value="Tripura">Tripura</option>
-            <option value="West Bengal">West Bengal</option>
-            <option value="Assam">Assam</option>
-          </select>
+    <!-- App Body Content Area -->
+    <div class="app-body">
+      <!-- Minimalist Top Context Bar (Quick Filters & Stats) -->
+      <header class="app-topbar">
+        <div class="topbar-left">
+          <div class="topbar-title-block">
+            <span class="topbar-app-title">VanDrishti</span>
+            <span class="topbar-divider">•</span>
+            <span class="topbar-subtitle">Forest Rights Act Cadastral Intelligence</span>
+          </div>
         </div>
 
-        <div class="filter-group">
-          <label for="filter-district"><i class="fa-solid fa-location-dot"></i> District:</label>
-          <select id="filter-district" class="custom-select">
-            <option value="ALL">All Districts (14)</option>
-          </select>
+        <div class="topbar-right">
+          <!-- Quick State & District Filter Pills -->
+          <div class="global-filter-bar">
+            <div class="filter-group">
+              <label for="filter-state"><i class="fa-solid fa-landmark"></i></label>
+              <select id="filter-state" class="custom-select">
+                <option value="ALL">All States Nationwide</option>
+              </select>
+            </div>
+
+            <div class="filter-group">
+              <label for="filter-district"><i class="fa-solid fa-location-dot"></i></label>
+              <select id="filter-district" class="custom-select">
+                <option value="ALL">All Districts</option>
+              </select>
+            </div>
+
+            <div class="filter-group hide-on-compact">
+              <label for="filter-claim-type"><i class="fa-solid fa-tags"></i></label>
+              <select id="filter-claim-type" class="custom-select">
+                <option value="ALL">All Rights (IFR/CFR)</option>
+                <option value="IFR">Individual (IFR)</option>
+                <option value="CFR">Community (CFR)</option>
+                <option value="CR">Community Rights (CR)</option>
+                <option value="CFRR">Resource Rights (CFRR)</option>
+              </select>
+            </div>
+
+            <div class="filter-group hide-on-compact">
+              <label for="filter-status"><i class="fa-solid fa-spinner"></i></label>
+              <select id="filter-status" class="custom-select">
+                <option value="ALL">All Stages</option>
+                <option value="Gram Sabha Verification">Gram Sabha</option>
+                <option value="SDLC Review">SDLC Review</option>
+                <option value="DLC Approval">DLC Approval</option>
+                <option value="Title Conferred">Title Conferred</option>
+                <option value="Rejected">Rejected</option>
+              </select>
+            </div>
+
+            <button id="btn-reset-filters" class="btn btn-icon-sm" title="Reset Filters">
+              <i class="fa-solid fa-rotate-left"></i>
+            </button>
+          </div>
+
+          <button id="btn-toggle-ai-brief" class="btn btn-hero-accent btn-sm" title="AI Decision Brief">
+            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <span>Briefing</span>
+          </button>
         </div>
 
-        <div class="filter-group">
-          <label for="filter-claim-type"><i class="fa-solid fa-tags"></i> Rights Type:</label>
-          <select id="filter-claim-type" class="custom-select">
-            <option value="ALL">All Types (IFR/CFR/CR)</option>
-            <option value="IFR">Individual (IFR)</option>
-            <option value="CFR">Community (CFR)</option>
-            <option value="CR">Community Rights (CR)</option>
-            <option value="CFRR">Resource Rights (CFRR)</option>
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label for="filter-status"><i class="fa-solid fa-spinner"></i> Stage:</label>
-          <select id="filter-status" class="custom-select">
-            <option value="ALL">All Stages</option>
-            <option value="Gram Sabha Verification">Gram Sabha</option>
-            <option value="SDLC Review">SDLC Review</option>
-            <option value="DLC Approval">DLC Approval</option>
-            <option value="Title Conferred">Title Conferred</option>
-            <option value="Rejected">Rejected</option>
-          </select>
-        </div>
-
-        <button id="btn-reset-filters" class="btn btn-icon-sm" title="Reset All Filters">
-          <i class="fa-solid fa-rotate-left"></i>
-        </button>
-      </div>
-    </nav>
+        <!-- Hidden Ticker DOM for Data Binding Sync -->
+        <span id="hdr-total-claims" style="display:none;"></span>
+        <span id="hdr-titles-granted" style="display:none;"></span>
+        <span id="hdr-anomalies-count" style="display:none;"></span>
+        <span id="hdr-land-hectares" style="display:none;"></span>
+      </header>
 
     <!-- Main Workspace Views -->
     <main class="main-content">
@@ -270,8 +252,8 @@
               <div class="map-tool-divider"></div>
 
               <div class="map-tool-group">
-                <button id="btn-basemap-dark" class="map-tool-btn active" title="Dark Carto Basemap"><i class="fa-solid fa-moon"></i> Dark</button>
-                <button id="btn-basemap-satellite" class="map-tool-btn" title="Satellite Imagery"><i class="fa-solid fa-satellite"></i> Satellite</button>
+                <button id="btn-basemap-dark" class="map-tool-btn" title="Dark Carto Basemap"><i class="fa-solid fa-moon"></i> Dark</button>
+                <button id="btn-basemap-satellite" class="map-tool-btn active" title="Satellite Imagery"><i class="fa-solid fa-satellite"></i> Satellite</button>
                 <button id="btn-basemap-topo" class="map-tool-btn" title="Topographic / Terrain"><i class="fa-solid fa-mountain"></i> Terrain</button>
               </div>
               <div class="map-tool-divider"></div>
@@ -280,12 +262,14 @@
 
             <!-- Map Legend -->
             <div class="map-legend-card">
-              <div class="legend-title">GIS Symbology</div>
+              <div class="legend-title">GIS Symbology & AI Risk Flags</div>
               <div class="legend-grid">
-                <div class="legend-item"><span class="legend-dot dot-ifr"></span> IFR Claim (Individual)</div>
-                <div class="legend-item"><span class="legend-dot dot-cfr"></span> CFR / CFRR (Community)</div>
+                <div class="legend-item"><span class="legend-dot dot-ifr"></span> IFR (Individual Claim)</div>
+                <div class="legend-item"><span class="legend-dot dot-cfr"></span> CFR/CFRR (Community)</div>
                 <div class="legend-item"><span class="legend-dot dot-title"></span> Title Deed Conferred</div>
-                <div class="legend-item"><span class="legend-dot dot-anomaly"></span> Critical AI Anomaly</div>
+                <div class="legend-item"><span class="legend-dot dot-anomaly"></span> Flagged AI Anomaly (!)</div>
+                <div class="legend-item"><span class="legend-indicator" style="border: 2px dashed #f43f5e; background: rgba(244,63,94,0.2);"></span> Critical Risk District</div>
+                <div class="legend-item"><span class="legend-indicator" style="border: 2px dashed #06b6d4; background: rgba(6,182,212,0.1);"></span> Low/Moderate District</div>
                 <div class="legend-item"><span class="legend-box box-dense-forest"></span> Dense Reserve Forest</div>
                 <div class="legend-item"><span class="legend-box box-sanctuary"></span> Protected Wildlife Buffer</div>
               </div>
@@ -620,6 +604,61 @@
 
     </main>
 
+    <!-- Side AI Agent Drawer (Persistent Copilot) -->
+    <aside id="sidebar-ai-agent-drawer" class="sidebar-ai-agent-drawer">
+      <div class="agent-drawer-header">
+        <div class="agent-drawer-title">
+          <div class="agent-avatar-small">
+            <img src="/vandrishti-logo.png" alt="VanDrishti AI" class="agent-avatar-img" />
+            <span class="agent-status-dot"></span>
+          </div>
+          <div class="agent-drawer-text">
+            <h4>VanDrishti AI Agent</h4>
+            <span>Forest Rights Legal & Cadastral Copilot</span>
+          </div>
+        </div>
+        <button id="btn-close-sidebar-agent" class="btn-close-agent" title="Close AI Assistant">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="agent-drawer-context-pill">
+        <div class="ctx-tag"><i class="fa-solid fa-crosshairs"></i> <span id="agent-drawer-ctx-district">All Districts</span></div>
+        <div class="ctx-tag warning"><i class="fa-solid fa-triangle-exclamation"></i> <span id="agent-drawer-ctx-anomalies">-- flagged</span></div>
+      </div>
+
+      <!-- Quick prompts chips inside drawer -->
+      <div class="agent-drawer-chips">
+        <button class="agent-quick-chip" data-agent-prompt="Analyze statutory bottlenecks & rejection outliers in the current filtered state/district.">
+          <i class="fa-solid fa-chart-pie"></i> Bottleneck Summary
+        </button>
+        <button class="agent-quick-chip" data-agent-prompt="Summarize Section 2(o) 75-year residency and 3-generation documentary evidence requirements for OTFD claimants.">
+          <i class="fa-solid fa-scale-balanced"></i> OTFD 75-Yr Rules
+        </button>
+        <button class="agent-quick-chip" data-agent-prompt="Draft an official administrative notice under FRA Rule 12A regarding unreasoned claim rejections.">
+          <i class="fa-solid fa-file-contract"></i> Draft Rule 12A Notice
+        </button>
+      </div>
+
+      <!-- Chat messages in drawer -->
+      <div class="agent-drawer-messages" id="agent-drawer-messages-container">
+        <div class="chat-message bot-message">
+          <div class="msg-avatar"><img src="/vandrishti-logo.png" alt="AI" class="agent-msg-avatar" /></div>
+          <div class="msg-bubble">
+            <strong>VanDrishti Copilot Active.</strong> I am continuously tracking spatial overlaps, Section 4(6) area limits, and SLA timelines across your active districts. Ask me anything or click a shortcut above.
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input in drawer -->
+      <div class="agent-drawer-input-wrapper">
+        <textarea id="agent-drawer-input" placeholder="Ask VanDrishti AI about claim anomalies, rules, or drafting..." rows="2"></textarea>
+        <button id="btn-send-drawer-message" class="btn btn-primary btn-drawer-send">
+          <i class="fa-solid fa-paper-plane"></i>
+        </button>
+      </div>
+    </aside>
+
     <!-- Modals & Drawers -->
 
     <!-- Modal 1: Claim Inspector & Lifecycle Timeline -->
@@ -792,7 +831,7 @@
           <div class="form-group">
             <label for="input-gemini-key"><strong>Google Gemini API Key:</strong></label>
             <p class="text-muted" style="font-size: 0.75rem; margin-bottom: 6px;">
-              Enables live Gemini 2.5/1.5 Flash grounded anomaly audits, official memo drafting, and custom legal intelligence.
+              Enables live Gemini Flash grounded anomaly audits, official memo drafting, and custom legal intelligence.
             </p>
             <input type="password" id="input-gemini-key" class="custom-select" style="width: 100%;" placeholder="AIzaSy..." />
           </div>
@@ -814,12 +853,9 @@
       </div>
     </div>
 
-  </div>
+    </div> <!-- End .app-body -->
+  </div> <!-- End #app.app-layout -->
 
-  <!-- Leaflet and Plugins via CDN -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
-  
   <script type="module" src="/src/main.js"></script>
 </body>
 </html>

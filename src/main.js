@@ -69,12 +69,20 @@ class FRAVisionApp {
       this.handleClaimUpdated(updatedClaim);
     });
 
+    // The WebGIS map is initialized defensively: a failure here (e.g. a blocked
+    // tile/CDN request) must not prevent navigation, filters, dashboard, or the
+    // AI copilot from working.
     this.mapManager = new WebGISMapManager(
       "leaflet-map",
       (claim) => this.claimModalController.openModal(claim),
       (districtName, state) => this.selectDistrict(districtName, state)
     );
-    this.mapManager.init();
+    try {
+      this.mapManager.init();
+    } catch (err) {
+      console.error("WebGIS map failed to initialize:", err);
+      this.showMapInitError();
+    }
 
     this.dashboardController = new DashboardViewController((districtName, state) => {
       this.selectDistrict(districtName, state);
@@ -113,6 +121,19 @@ class FRAVisionApp {
     };
   }
 
+  showMapInitError() {
+    const container = document.getElementById("leaflet-map");
+    if (container) {
+      container.innerHTML = `
+        <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:10px; color: var(--text-muted); text-align:center; padding: 24px;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size: 2rem; color: var(--amber-warning);"></i>
+          <strong style="color: var(--text-primary);">WebGIS map could not load.</strong>
+          <span style="font-size: 0.8rem; max-width: 420px;">Satellite tile services may be unreachable from this network. All other modules (Analytics, Triage, Registry, AI Copilot) remain fully functional.</span>
+        </div>
+      `;
+    }
+  }
+
   getFilteredClaims() {
     return this.processedClaims.filter((c) => {
       if (this.selectedState !== "ALL" && c.state !== this.selectedState) return false;
@@ -136,7 +157,8 @@ class FRAVisionApp {
   renderAllViews() {
     const filteredClaims = this.getFilteredClaims();
 
-    // Update Map
+    // Update Map with Claims and Dynamic District Risk Analytics
+    this.mapManager.setDistrictAnalytics(this.districtAnalytics);
     this.mapManager.updateClaimsMarkers(filteredClaims);
     document.getElementById("map-anomaly-count").innerText = filteredClaims.filter((c) => c.hasAnomaly).length;
 
@@ -398,7 +420,7 @@ class FRAVisionApp {
     const targetView = document.getElementById(targetViewId);
     if (targetView) targetView.classList.add("active");
 
-    if (targetViewId === "map-view" && this.mapManager) {
+    if (targetViewId === "map-view" && this.mapManager && this.mapManager.map) {
       setTimeout(() => this.mapManager.map.invalidateSize(), 150);
     }
   }
@@ -577,6 +599,7 @@ class FRAVisionApp {
     document.getElementById("layer-claims-cfr").onchange = (e) => this.mapManager.setLayerVisibility("cfr", e.target.checked);
     document.getElementById("layer-anomalies").onchange = (e) => this.mapManager.setLayerVisibility("anomalies", e.target.checked);
     document.getElementById("layer-forest-cover").onchange = (e) => this.mapManager.setLayerVisibility("forestCover", e.target.checked);
+    document.getElementById("layer-heatmap").onchange = (e) => this.mapManager.setLayerVisibility("heatmap", e.target.checked);
   }
 
   bindModals() {
@@ -866,8 +889,19 @@ class FRAVisionApp {
   }
 }
 
-// Bootstrap Application on DOM Ready
-document.addEventListener("DOMContentLoaded", () => {
-  const app = new FRAVisionApp();
-  app.init();
-});
+// Bootstrap Application on DOM Ready or Immediate if already loaded
+function bootstrapApp() {
+  try {
+    const app = new FRAVisionApp();
+    app.init();
+    window._fraApp = app;
+  } catch (err) {
+    console.error("Error initializing VanDrishti FRA app:", err);
+  }
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", bootstrapApp);
+} else {
+  bootstrapApp();
+}

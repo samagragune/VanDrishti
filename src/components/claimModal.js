@@ -1,5 +1,7 @@
 // Claim Inspector & Lifecycle Modal Controller for FRA Monitoring
 
+import L from 'leaflet';
+
 export class ClaimModalController {
   constructor(onUpdateClaimCallback) {
     this.onUpdateClaim = onUpdateClaimCallback;

@@ -16,264 +16,122 @@ export class HomePortalView {
     if (!container) return;
 
     container.innerHTML = `
-      <div class="portal-home-container">
-        <!-- Top Gov Utility Bar (Official Portal Header) -->
-        <div class="portal-utility-bar">
-          <div class="util-left">
-            <span><i class="fa-solid fa-phone"></i> Toll-Free Helpline: <strong>1800-11-8888</strong> (09:45 AM - 06:15 PM IST)</span>
-            <span class="util-sep">|</span>
-            <span><i class="fa-solid fa-envelope"></i> Support Email: <strong>support.fra-dss@tribal.gov.in</strong></span>
-          </div>
-          <div class="util-right">
-            <a href="#portal-services" class="util-link">Skip to Main Content</a>
-            <span class="util-sep">|</span>
-            <div class="lang-switch-badge">
-              <i class="fa-solid fa-circle-check text-emerald"></i>
-              <span>English (Official)</span>
-            </div>
-            <span class="util-sep">|</span>
-            <div class="a11y-controls">
-              <button class="a11y-btn" title="Decrease Font">A-</button>
-              <button class="a11y-btn active" title="Default Font">A</button>
-              <button class="a11y-btn" title="Increase Font">A+</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Gov Portal Hero Banner (MoTA Official Identity) -->
-        <div class="portal-hero-banner">
-          <div class="hero-carousel-track">
-            <div class="hero-slide active">
-              <div class="hero-bg-overlay"></div>
-              <div class="hero-content">
-                <div class="gov-emblem-badge">
-                  <i class="fa-solid fa-landmark"></i>
-                  <span>Ministry of Tribal Affairs | Government of India</span>
-                </div>
-                <h1 class="hero-title">National Forest Rights Act (FRA 2006) Decision Support & WebGIS Cadastral Portal</h1>
-                <p class="hero-subtitle">
-                  AI-Powered Geospatial Monitoring, Statutory Anomaly Detection & Executive Decision Support for Gram Sabhas, SDLCs, DLCs, and State Nodal Agencies
-                </p>
-                <div class="hero-cta-group">
-                  <button class="btn btn-hero-primary" data-nav="map-view">
-                    <i class="fa-solid fa-map-location-dot"></i>
-                    <span>Launch WebGIS Map</span>
-                  </button>
-                  <button class="btn btn-hero-secondary" data-nav="dashboard-view">
-                    <i class="fa-solid fa-chart-line"></i>
-                    <span>Executive Analytics</span>
-                  </button>
-                  <button class="btn btn-hero-accent" data-nav="anomaly-view">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    <span>Anomaly Triage Queue</span>
-                  </button>
-                </div>
-              </div>
-            </div>
+      <div class="portal-home-container clean-central-mode">
+        
+        <!-- Central Minimalist Hero Section -->
+        <div class="central-hero-wrap">
+          <div class="central-brand-emblem">
+            <img src="/vandrishti-logo.png" alt="VanDrishti Emblem" class="central-logo-img" />
           </div>
 
-          <!-- Hero Ticker Stats (National MoTA Aggregate) -->
-          <div class="hero-live-stats-bar">
-            <div class="hero-stat-box">
-              <span class="stat-num">${(NATIONWIDE_SUMMARY.totalClaimsReceived / 100000).toFixed(2)} Lakh</span>
-              <span class="stat-lbl"><i class="fa-solid fa-folder-open"></i> Total Claims Received</span>
+          <h1 class="central-title">VanDrishti</h1>
+          <p class="central-subtitle">
+            Forest Rights Act (FRA 2006) Geospatial Cadastral Intelligence & AI Statutory Decision Platform
+          </p>
+
+          <!-- 3 Distanced Action Buttons -->
+          <div class="central-action-row">
+            <button class="btn btn-central-primary" data-nav="map-view">
+              <i class="fa-solid fa-map-location-dot"></i>
+              <span>Launch WebGIS Satellite Map</span>
+            </button>
+            <button class="btn btn-central-secondary" data-nav="dashboard-view">
+              <i class="fa-solid fa-chart-line"></i>
+              <span>Executive Analytics</span>
+            </button>
+            <button class="btn btn-central-accent" data-nav="anomaly-view">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+              <span>Anomaly Triage Queue</span>
+            </button>
+          </div>
+
+          <!-- Minimal Live Stat Strip -->
+          <div class="central-stats-strip">
+            <div class="central-stat-pill">
+              <span class="val">${(NATIONWIDE_SUMMARY.totalClaimsReceived / 100000).toFixed(2)} Lakh</span>
+              <span class="lbl">Claims Processed</span>
             </div>
-            <div class="hero-stat-box success">
-              <span class="stat-num">${(NATIONWIDE_SUMMARY.totalTitlesConferred / 100000).toFixed(2)} Lakh</span>
-              <span class="stat-lbl"><i class="fa-solid fa-certificate"></i> Titles Conferred</span>
+            <div class="central-stat-pill success">
+              <span class="val">${(NATIONWIDE_SUMMARY.totalTitlesConferred / 100000).toFixed(2)} Lakh</span>
+              <span class="lbl">Titles Conferred</span>
             </div>
-            <div class="hero-stat-box warning">
-              <span class="stat-num">${(NATIONWIDE_SUMMARY.totalExtentDistributedHa / 100000).toFixed(2)} Lakh Ha</span>
-              <span class="stat-lbl"><i class="fa-solid fa-mountain-sun"></i> Forest Land Titled</span>
+            <div class="central-stat-pill info">
+              <span class="val">${(NATIONWIDE_SUMMARY.totalExtentDistributedHa / 100000).toFixed(2)} Lakh Ha</span>
+              <span class="lbl">Forest Land Titled</span>
             </div>
-            <div class="hero-stat-box info">
-              <span class="stat-num">${NATIONWIDE_SUMMARY.allIndiaRecognitionRate}%</span>
-              <span class="stat-lbl"><i class="fa-solid fa-percent"></i> All-India Recognition Rate</span>
+            <div class="central-stat-pill accent">
+              <span class="val">${NATIONWIDE_SUMMARY.allIndiaRecognitionRate}%</span>
+              <span class="lbl">Recognition Rate</span>
             </div>
           </div>
         </div>
 
-        <!-- Main Section: Grid Services (Left) + Announcements Board (Right) -->
-        <div class="portal-main-layout" id="portal-services">
-          <!-- Left: 12 Pill-shaped Service Tiles (Official Portal Service Grid) -->
-          <div class="services-column">
-            <div class="section-heading-bar">
-              <div class="heading-title">
-                <i class="fa-solid fa-grip"></i>
-                <h2>Key Citizen & Administrative Services (Portal Modules)</h2>
-              </div>
-              <span class="heading-tag">12 Active Services</span>
-            </div>
-
-            <div class="bhulekh-pill-grid">
-              <button class="bhulekh-pill-btn" data-nav="claims-table-view">
-                <div class="pill-icon"><i class="fa-solid fa-file-lines"></i></div>
-                <div class="pill-text">
-                  <strong>Claims Registry & Verification</strong>
-                  <span>Search, verify, and track claim dossiers</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn highlight" data-nav="map-view">
-                <div class="pill-icon"><i class="fa-solid fa-map"></i></div>
-                <div class="pill-text">
-                  <strong>WebGIS Cadastral Map View</strong>
-                  <span>Interactive parcels, layers & boundaries</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-nav="dashboard-view">
-                <div class="pill-icon"><i class="fa-solid fa-chart-pie"></i></div>
-                <div class="pill-text">
-                  <strong>Executive Analytics & Reports</strong>
-                  <span>State & district comparative charts</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn warning" data-nav="anomaly-view">
-                <div class="pill-icon"><i class="fa-solid fa-shield-halved"></i></div>
-                <div class="pill-text">
-                  <strong>Statutory Anomaly Triage Queue</strong>
-                  <span>Rule 12A, SLA & 4 Ha ceiling engine</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn ai-special" data-nav="ai-assistant-view">
-                <div class="pill-icon"><i class="fa-solid fa-brain"></i></div>
-                <div class="pill-text">
-                  <strong>Gemini AI Legal Copilot</strong>
-                  <span>Grounded legal RAG & compliance audits</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-action="open-thane-focus">
-                <div class="pill-icon"><i class="fa-solid fa-location-crosshairs"></i></div>
-                <div class="pill-text">
-                  <strong>Thane District Official Hub</strong>
-                  <span>18,528 verified government claims</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-action="open-nationwide-section">
-                <div class="pill-icon"><i class="fa-solid fa-flag"></i></div>
-                <div class="pill-text">
-                  <strong>Nationwide MoTA Progress</strong>
-                  <span>14+ States All-India registry table</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-action="open-data-modal">
-                <div class="pill-icon"><i class="fa-solid fa-download"></i></div>
-                <div class="pill-text">
-                  <strong>Open Government Data</strong>
-                  <span>Download official CSVs & GeoJSON</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-action="generate-brief">
-                <div class="pill-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
-                <div class="pill-text">
-                  <strong>AI Executive Intelligence Brief</strong>
-                  <span>One-click ministerial dossier generator</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-action="show-knowledge-base">
-                <div class="pill-icon"><i class="fa-solid fa-book-scale"></i></div>
-                <div class="pill-text">
-                  <strong>Statutory Rules & Guidelines</strong>
-                  <span>FRA 2006 legal clauses & precedents</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-nav="map-view" data-layer="reserves">
-                <div class="pill-icon"><i class="fa-solid fa-tree"></i></div>
-                <div class="pill-text">
-                  <strong>Tiger Reserves & Protected Zones</strong>
-                  <span>Critical habitat & core buffer layers</span>
-                </div>
-              </button>
-
-              <button class="bhulekh-pill-btn" data-action="open-helpdesk">
-                <div class="pill-icon"><i class="fa-solid fa-headset"></i></div>
-                <div class="pill-text">
-                  <strong>Grievance Redressal & Helpdesk</strong>
-                  <span>Dispute escalation & Nodal support</span>
-                </div>
-              </button>
-            </div>
+        <!-- Clean Distanced Options & Modules List (MP Bhulekh / Bhuvan Style Services Matrix) -->
+        <div class="central-modules-section" id="portal-services">
+          <div class="modules-header">
+            <h3><i class="fa-solid fa-grid-2-plus"></i> Official Portal Services & Cadastral Decision Modules</h3>
+            <span class="modules-hint">Click any service card to open its dedicated workspace</span>
           </div>
 
-          <!-- Right: Notice & Announcements Board (Official Live Circulars) -->
-          <div class="announcements-column">
-            <div class="announcement-card">
-              <div class="announcement-header">
-                <div class="ann-title">
-                  <i class="fa-solid fa-newspaper"></i>
-                  <h3>Official Announcements & Live Circulars</h3>
-                </div>
-                <span class="live-pulse-dot"></span>
+          <div class="central-cards-grid">
+            <!-- 1. Claims Master Registry -->
+            <div class="central-card" data-nav="claims-table-view">
+              <div class="card-icon"><i class="fa-solid fa-file-signature"></i></div>
+              <div class="card-info">
+                <h4>Land Records & Claims Registry</h4>
+                <p>Browse, filter, and inspect Individual (IFR) & Community (CFR) claims dossiers and land records.</p>
               </div>
+              <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
 
-              <div class="announcement-list">
-                <div class="ann-item critical" data-action="focus-thane-otfd">
-                  <div class="ann-badge-bar">
-                    <span class="badge badge-danger">Critical Anomaly Alert</span>
-                    <span class="ann-date">04 Sep 2026</span>
-                  </div>
-                  <h4 class="ann-headline">Thane District: 90.7% Rejection Rate on OTFD Claims</h4>
-                  <p class="ann-snippet">
-                    5,045 claims rejected across Ulhasnagar (100%), Kalyan (98.7%), and Bhiwandi (86.8%). Flagged for lack of mandatory Section 12A speaking orders.
-                  </p>
-                  <a href="javascript:void(0)" class="ann-action-link"><i class="fa-solid fa-arrow-right"></i> Inspect Anomaly in Triage Queue</a>
-                </div>
-
-                <div class="ann-item warning" data-action="focus-thane-sla">
-                  <div class="ann-badge-bar">
-                    <span class="badge badge-warning">SLA Timeline Breach</span>
-                    <span class="ann-date">02 Sep 2026</span>
-                  </div>
-                  <h4 class="ann-headline">Bhiwandi & Thane SDLCs: 2,437 Claims Pending > 180 Days</h4>
-                  <p class="ann-snippet">
-                    Statutory resolution benchmark exceeded at the Sub-Divisional level. System has prepared expedited Rule 12A procedural notices.
-                  </p>
-                  <a href="javascript:void(0)" class="ann-action-link"><i class="fa-solid fa-arrow-right"></i> Review Draft Notice</a>
-                </div>
-
-                <div class="ann-item info" data-action="open-nationwide-section">
-                  <div class="ann-badge-bar">
-                    <span class="badge badge-primary">MoTA Nationwide Update</span>
-                    <span class="ann-date">28 Aug 2026</span>
-                  </div>
-                  <h4 class="ann-headline">23.86 Lakh Titles Conferred Across All Indian States</h4>
-                  <p class="ann-snippet">
-                    Odisha leads with a 71.7% recognition rate; Madhya Pradesh and Chhattisgarh continue large-scale digitization of community forest rights.
-                  </p>
-                  <a href="javascript:void(0)" class="ann-action-link"><i class="fa-solid fa-arrow-right"></i> View Nationwide State Table</a>
-                </div>
-
-                <div class="ann-item success">
-                  <div class="ann-badge-bar">
-                    <span class="badge badge-success">AI Engine Status</span>
-                    <span class="ann-date">15 Aug 2026</span>
-                  </div>
-                  <h4 class="ann-headline">Gemini 3.6 Flash Legal AI Engine Active & Grounded</h4>
-                  <p class="ann-snippet">
-                    Live verification against FRA 2006 statutory rules, Section 4(6) 4 Ha ceiling compliance, and Gram Sabha resolution quorum checks.
-                  </p>
-                </div>
+            <!-- 2. Cadastral Spatial Map -->
+            <div class="central-card" data-nav="map-view">
+              <div class="card-icon"><i class="fa-solid fa-map-location-dot"></i></div>
+              <div class="card-info">
+                <h4>Cadastral Parcel & GIS Map</h4>
+                <p>Interactive high-resolution satellite map with district boundaries, forest reserves, and cadastral plots.</p>
               </div>
+              <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
 
-              <!-- Quick Demo Shortcuts for Hackathon Judges -->
-              <div class="demo-shortcuts-box">
-                <h5><i class="fa-solid fa-bolt"></i> Guided Demo Scenarios (For Judges):</h5>
-                <div class="demo-buttons">
-                  <button class="btn btn-sm btn-outline-warning" data-demo="otfd-rejection">1. Thane OTFD Rejection Anomaly (90.7%)</button>
-                  <button class="btn btn-sm btn-outline-danger" data-demo="sla-breach">2. Bhiwandi 180-Day SLA Delay</button>
-                  <button class="btn btn-sm btn-outline-primary" data-demo="reserve-overlap">3. Similipal Wildlife Sanctuary Overlap</button>
-                  <button class="btn btn-sm btn-outline-cyan" data-demo="area-violation">4. Section 4(6) 4 Ha Ceiling Violation</button>
-                </div>
+            <!-- 3. Executive Analytics & Reporting -->
+            <div class="central-card" data-nav="dashboard-view">
+              <div class="card-icon"><i class="fa-solid fa-chart-line"></i></div>
+              <div class="card-info">
+                <h4>Executive Dashboard & Reports</h4>
+                <p>Real-time analytics on title conferment rates, disposal velocities, and district-level performance KPIs.</p>
               </div>
+              <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+
+            <!-- 4. Statutory Anomaly Detection -->
+            <div class="central-card warning-tint" data-nav="anomaly-view">
+              <div class="card-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <div class="card-info">
+                <h4>Statutory Anomaly Triage</h4>
+                <p>Automated detection of SLA breaches (>180d), Rule 12A violations, and 4 Ha statutory ceiling breaches.</p>
+              </div>
+              <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+
+            <!-- 5. AI Legal Assistant -->
+            <div class="central-card ai-tint" data-nav="ai-assistant-view">
+              <div class="card-icon"><i class="fa-solid fa-brain"></i></div>
+              <div class="card-info">
+                <h4>AI Legal Copilot & Case Law RAG</h4>
+                <p>Ask legal questions grounded in FRA 2006 statutes, High Court precedents, and MoTA operational guidelines.</p>
+              </div>
+              <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
+            </div>
+
+            <!-- 6. Nationwide Implementation Matrix -->
+            <div class="central-card" data-action="open-nationwide-section">
+              <div class="card-icon"><i class="fa-solid fa-earth-asia"></i></div>
+              <div class="card-info">
+                <h4>All-India MoTA Progress Matrix</h4>
+                <p>Comprehensive state-wise official registry tracking progress across all 28 Indian states & union territories.</p>
+              </div>
+              <div class="card-arrow"><i class="fa-solid fa-arrow-right"></i></div>
             </div>
           </div>
         </div>

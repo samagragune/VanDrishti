@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "chart.js": "^4.4.7",
-    "leaflet": "^1.9.4"
+    "leaflet": "^1.9.4",
+    "leaflet.markercluster": "^1.5.3"
   },
   "devDependencies": {
     "vite": "^6.0.7"

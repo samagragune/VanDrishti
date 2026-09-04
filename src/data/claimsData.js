@@ -192,13 +192,14 @@ export function generateMasterClaimsDataset() {
     const count = randomInt(36, 44);
     const state = district.state;
     const stateTribes = TRIBAL_NAMES[state] || TRIBAL_NAMES["Odisha"];
+    const districtClaimsSoFar = [];
 
     for (let i = 0; i < count; i++) {
       const claimId = `CLM-${district.code}-${claimSeq++}`;
       const firstName = randomChoice(APPLICANT_FIRST_NAMES);
       const lastName = randomChoice(APPLICANT_LAST_NAMES);
       const applicantName = `${firstName} ${lastName}`;
-      const gramSabha = randomChoice(GRAM_SABHA_NAMES);
+      let gramSabha = randomChoice(GRAM_SABHA_NAMES);
 
       // Category: 60% ST, 25% PVTG, 15% OTFD
       const catRoll = Math.random();
@@ -232,8 +233,18 @@ export function generateMasterClaimsDataset() {
       }
 
       // Coordinates within district bounds
-      const lat = randomFloat(district.center[0] - 0.25, district.center[0] + 0.25, 4);
-      const lng = randomFloat(district.center[1] - 0.25, district.center[1] + 0.25, 4);
+      let lat = randomFloat(district.center[0] - 0.25, district.center[0] + 0.25, 4);
+      let lng = randomFloat(district.center[1] - 0.25, district.center[1] + 0.25, 4);
+
+      // ~6% intentional spatial-overlap seeding: clone an earlier claim's Gram Sabha
+      // and jitter its coordinates within ~300m to simulate real boundary conflicts
+      // (mismatched land records) for the AI spatial-overlap detector to catch.
+      if (districtClaimsSoFar.length > 0 && Math.random() < 0.06) {
+        const anchor = randomChoice(districtClaimsSoFar);
+        gramSabha = anchor.gramSabha;
+        lat = anchor.coordinates[0] + (Math.random() - 0.5) * 0.006;
+        lng = anchor.coordinates[1] + (Math.random() - 0.5) * 0.006;
+      }
 
       // Submission timeline (between 60 to 450 days ago)
       const daysInPipeline = randomInt(45, 460);
@@ -312,6 +323,8 @@ export function generateMasterClaimsDataset() {
         // Flags to be computed and enriched by anomaly engine
         anomalies: []
       });
+
+      districtClaimsSoFar.push({ gramSabha, coordinates: [lat, lng] });
     }
   });
 

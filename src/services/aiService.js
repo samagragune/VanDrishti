@@ -8,7 +8,7 @@ export class FRAAIService {
     this.knowledgeBase = FRA_LEGAL_KNOWLEDGE;
     const envKey = (typeof import.meta !== "undefined" && import.meta.env && import.meta.env.VITE_GEMINI_API_KEY) ? import.meta.env.VITE_GEMINI_API_KEY : "";
     this.apiKey = localStorage.getItem("FRA_GEMINI_API_KEY") || envKey || "";
-    this.geminiModel = "gemini-3.6-flash"; // Connected & Verified Model
+    this.geminiModel = "gemini-3.6-flash"; // Current Gemini Flash model (verified reachable with live key)
   }
 
   setApiKey(key) {
@@ -150,7 +150,7 @@ Format output in clean HTML with sections:
 
       const liveResponse = await this.callGemini(geminiPrompt, "You are the AI Chief Technical Advisor for Forest Rights Act governance. Output clean semantic HTML.");
       if (liveResponse) {
-        return `<div class="live-ai-badge" style="margin-bottom: 12px; font-size: 0.75rem; color: var(--purple-ai); font-weight: 600;"><i class="fa-solid fa-bolt"></i> Live Gemini 2.5 Flash Grounded Response</div>` + liveResponse;
+        return `<div class="live-ai-badge" style="margin-bottom: 12px; font-size: 0.75rem; color: var(--purple-ai); font-weight: 600;"><i class="fa-solid fa-bolt"></i> Live Gemini Flash Grounded Response</div>` + liveResponse;
       }
     }
 

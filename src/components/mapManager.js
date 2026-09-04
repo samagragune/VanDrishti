@@ -1,7 +1,23 @@
 // WebGIS Leaflet Map Controller for Forest Rights Act (FRA) Monitoring
 // Manages geospatial layers, district boundaries, markers, clusters, and interactive popups
 
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet.markercluster';
+import 'leaflet.markercluster/dist/MarkerCluster.css';
+import 'leaflet.markercluster/dist/MarkerCluster.Default.css';
+import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
+import markerIcon from 'leaflet/dist/images/marker-icon.png';
+import markerShadow from 'leaflet/dist/images/marker-shadow.png';
 import { DISTRICT_REGIONS, FOREST_RESERVE_LAYERS } from '../data/districtBoundaries.js';
+
+// Fix Leaflet's default icon paths, which break under Vite's bundled asset URLs.
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: markerIcon2x,
+  iconUrl: markerIcon,
+  shadowUrl: markerShadow
+});
 
 export class WebGISMapManager {
   constructor(mapContainerId, onSelectClaimCallback, onSelectDistrictCallback) {
@@ -13,10 +29,11 @@ export class WebGISMapManager {
     this.markerClusterGroup = null;
     this.districtLayersGroup = null;
     this.forestLayersGroup = null;
+    this.heatmapLayerGroup = null;
     this.activeClaims = [];
     this.activeDistricts = DISTRICT_REGIONS;
 
-    this.currentBasemap = "dark";
+    this.currentBasemap = "satellite";
     this.tileLayers = {};
 
     this.visibleLayers = {
@@ -24,7 +41,8 @@ export class WebGISMapManager {
       ifr: true,
       cfr: true,
       anomalies: true,
-      forestCover: true
+      forestCover: true,
+      heatmap: false
     };
   }
 
@@ -70,28 +88,59 @@ export class WebGISMapManager {
       }
     );
 
-    this.tileLayers.dark.addTo(this.map);
+    this.tileLayers.satellite.addTo(this.map);
 
     // Initialize Layer Groups
     this.districtLayersGroup = L.featureGroup().addTo(this.map);
     this.forestLayersGroup = L.featureGroup().addTo(this.map);
+    this.heatmapLayerGroup = L.featureGroup();
 
-    // Initialize Marker Cluster Group
+    // Initialize Marker Cluster Group with Dynamic Anomaly Risk Detection
     this.markerClusterGroup = L.markerClusterGroup({
       maxClusterRadius: 45,
       spiderfyOnMaxZoom: true,
       showCoverageOnHover: false,
       zoomToBoundsOnClick: true,
       iconCreateFunction: (cluster) => {
-        const count = cluster.getChildCount();
+        const markers = cluster.getAllChildMarkers();
+        const count = markers.length;
+        
+        let anomalyCount = 0;
+        let hasCritical = false;
+        let hasHigh = false;
+
+        markers.forEach((m) => {
+          if (m.claimData && m.claimData.hasAnomaly) {
+            anomalyCount++;
+            const isCritical = m.claimData.anomalies && m.claimData.anomalies.some(
+              (a) => a.severity === 'CRITICAL' || a.type === 'HIGH_REJECTION' || a.type === 'SPATIAL_OVERLAP'
+            );
+            if (isCritical) hasCritical = true;
+            else hasHigh = true;
+          }
+        });
+
         let cClass = 'marker-cluster-small';
         if (count > 25) cClass = 'marker-cluster-medium';
         if (count > 70) cClass = 'marker-cluster-large';
 
+        // Anomaly alert styling
+        let anomalyClass = '';
+        let badgeHtml = '';
+
+        if (anomalyCount > 0) {
+          if (hasCritical || anomalyCount >= 5) {
+            anomalyClass = 'cluster-anomaly-critical';
+          } else {
+            anomalyClass = 'cluster-anomaly-high';
+          }
+          badgeHtml = `<span class="cluster-anomaly-badge" title="${anomalyCount} Anomalies Flagged"><i class="fa-solid fa-triangle-exclamation"></i> ${anomalyCount}</span>`;
+        }
+
         return L.divIcon({
-          html: `<div><span>${count}</span></div>`,
-          className: `marker-cluster ${cClass}`,
-          iconSize: L.point(36, 36)
+          html: `<div class="cluster-inner"><span>${count}</span>${badgeHtml}</div>`,
+          className: `marker-cluster ${cClass} ${anomalyClass}`,
+          iconSize: L.point(42, 42)
         });
       }
     });
@@ -104,6 +153,7 @@ export class WebGISMapManager {
   }
 
   setBasemap(type) {
+    if (!this.map) return;
     if (this.tileLayers[this.currentBasemap]) {
       this.map.removeLayer(this.tileLayers[this.currentBasemap]);
     }
@@ -113,27 +163,60 @@ export class WebGISMapManager {
     }
   }
 
+  setDistrictAnalytics(analytics) {
+    this.districtAnalytics = analytics || [];
+    this.renderDistrictBoundaries();
+  }
+
   renderDistrictBoundaries() {
+    if (!this.districtLayersGroup) return;
     this.districtLayersGroup.clearLayers();
 
     this.activeDistricts.forEach((district) => {
       let layer;
+      
+      // Look up district analytics to get live risk tier & anomaly count
+      const analytics = (this.districtAnalytics || []).find((d) => d.name === district.name && d.state === district.state);
+      const riskTier = analytics?.riskTier || 'LOW';
+      const anomalyCount = analytics?.anomalousClaimsCount || 0;
+
+      let borderColor = '#06b6d4';
+      let fillColor = 'rgba(6, 182, 212, 0.08)';
+      let dashArray = '4, 4';
+      let fillOpacity = 0.25;
+
+      if (riskTier === 'CRITICAL' || anomalyCount >= 8) {
+        borderColor = '#f43f5e';
+        fillColor = 'rgba(244, 63, 94, 0.18)';
+        dashArray = '3, 3';
+        fillOpacity = 0.35;
+      } else if (riskTier === 'MODERATE' || anomalyCount >= 3) {
+        borderColor = '#f59e0b';
+        fillColor = 'rgba(245, 158, 11, 0.12)';
+        dashArray = '4, 4';
+        fillOpacity = 0.28;
+      }
+
+      const tooltipContent = `
+        <div style="font-size: 11px; min-width: 140px;">
+          <strong style="color: ${borderColor}; font-size: 12px;">${district.name} (${district.state})</strong><br/>
+          <span>Risk Status: <strong>${riskTier}</strong> (${anomalyCount} Anomalies)</span><br/>
+          <span>Tribal Pop: ${district.tribalPct}% | Forest: ${(district.forestAreaHa / 1000).toFixed(0)}k Ha</span>
+          ${analytics ? `<br/><span>Recognition: ${analytics.recognitionRate}% | Rejection: ${analytics.rejectionRate}%</span>` : ''}
+        </div>
+      `;
 
       if (district.geoJson) {
         layer = L.geoJSON(district.geoJson, {
           style: {
-            color: '#06b6d4',
-            weight: 2,
-            dashArray: '4, 4',
-            fillColor: 'rgba(6, 182, 212, 0.08)',
-            fillOpacity: 0.25
+            color: borderColor,
+            weight: riskTier === 'CRITICAL' ? 2.5 : 2,
+            dashArray: dashArray,
+            fillColor: fillColor,
+            fillOpacity: fillOpacity
           },
           onEachFeature: (feature, fLayer) => {
-            const featName = feature.properties?.name || district.name;
-            fLayer.bindTooltip(
-              `<strong>${featName} (${district.state})</strong><br/>Official Boundary (LGD: ${feature.properties?.['ref:LGD:district'] || 'District'})<br/>Tribal Pop: ${district.tribalPct}% | Forest: ${(district.forestAreaHa / 1000).toFixed(0)}k Ha`,
-              { sticky: true, className: 'leaflet-tooltip-dark' }
-            );
+            fLayer.bindTooltip(tooltipContent, { sticky: true, className: 'leaflet-tooltip-dark' });
 
             fLayer.on('click', () => {
               if (this.onSelectDistrict) {
@@ -144,34 +227,31 @@ export class WebGISMapManager {
 
             fLayer.on('mouseover', (e) => {
               e.target.setStyle({
-                weight: 3,
+                weight: 3.5,
                 color: '#10b981',
-                fillOpacity: 0.4
+                fillOpacity: 0.45
               });
             });
 
             fLayer.on('mouseout', (e) => {
               e.target.setStyle({
-                weight: 2,
-                color: '#06b6d4',
-                fillOpacity: 0.25
+                weight: riskTier === 'CRITICAL' ? 2.5 : 2,
+                color: borderColor,
+                fillOpacity: fillOpacity
               });
             });
           }
         });
       } else {
         layer = L.polygon(district.polygon, {
-          color: '#06b6d4',
-          weight: 2,
-          dashArray: '4, 4',
-          fillColor: 'rgba(6, 182, 212, 0.08)',
-          fillOpacity: 0.25
+          color: borderColor,
+          weight: riskTier === 'CRITICAL' ? 2.5 : 2,
+          dashArray: dashArray,
+          fillColor: fillColor,
+          fillOpacity: fillOpacity
         });
 
-        layer.bindTooltip(
-          `<strong>${district.name} (${district.state})</strong><br/>Tribal Pop: ${district.tribalPct}% | Forest: ${(district.forestAreaHa / 1000).toFixed(0)}k Ha`,
-          { sticky: true, className: 'leaflet-tooltip-dark' }
-        );
+        layer.bindTooltip(tooltipContent, { sticky: true, className: 'leaflet-tooltip-dark' });
 
         layer.on('click', () => {
           if (this.onSelectDistrict) {
@@ -183,18 +263,18 @@ export class WebGISMapManager {
         layer.on('mouseover', (e) => {
           const l = e.target;
           l.setStyle({
-            weight: 3,
+            weight: 3.5,
             color: '#10b981',
-            fillOpacity: 0.4
+            fillOpacity: 0.45
           });
         });
 
         layer.on('mouseout', (e) => {
           const l = e.target;
           l.setStyle({
-            weight: 2,
-            color: '#06b6d4',
-            fillOpacity: 0.25
+            weight: riskTier === 'CRITICAL' ? 2.5 : 2,
+            color: borderColor,
+            fillOpacity: fillOpacity
           });
         });
       }
@@ -204,6 +284,7 @@ export class WebGISMapManager {
   }
 
   renderForestOverlays() {
+    if (!this.forestLayersGroup) return;
     this.forestLayersGroup.clearLayers();
 
     FOREST_RESERVE_LAYERS.forEach((res) => {
@@ -221,6 +302,7 @@ export class WebGISMapManager {
 
   updateClaimsMarkers(claims) {
     this.activeClaims = claims;
+    if (!this.markerClusterGroup) return;
     this.markerClusterGroup.clearLayers();
 
     claims.forEach((claim) => {
@@ -251,6 +333,7 @@ export class WebGISMapManager {
       });
 
       const marker = L.marker(claim.coordinates, { icon: customIcon });
+      marker.claimData = claim;
 
       const anomalyBadge = claim.hasAnomaly
         ? `<span class="badge badge-danger"><i class="fa-solid fa-triangle-exclamation"></i> ${claim.anomalies[0].title}</span>`
@@ -275,6 +358,22 @@ export class WebGISMapManager {
         </div>
       `;
 
+      const hoverTooltipContent = `
+        <div style="font-size: 11px; min-width: 170px; line-height: 1.4;">
+          <strong style="color: ${claim.hasAnomaly ? '#f43f5e' : '#10b981'}; font-size: 12px;">${claim.id} • ${claim.claimType}</strong><br/>
+          <span><strong>Applicant:</strong> ${claim.applicant} (${claim.category})</span><br/>
+          <span><strong>Area:</strong> ${claim.landAreaHa} Ha | <strong>Stage:</strong> ${claim.status}</span><br/>
+          <span><strong>Gram Sabha:</strong> ${claim.gramSabha}, ${claim.district}</span>
+          ${claim.hasAnomaly ? `<div style="margin-top: 4px; color: #f43f5e; font-weight: 700;"><i class="fa-solid fa-triangle-exclamation"></i> ${claim.anomalies[0].title}</div>` : ''}
+        </div>
+      `;
+
+      marker.bindTooltip(hoverTooltipContent, {
+        sticky: true,
+        direction: 'top',
+        className: 'leaflet-tooltip-dark'
+      });
+
       marker.bindPopup(popupHtml, { maxWidth: 320 });
 
       marker.on('popupopen', () => {
@@ -289,10 +388,59 @@ export class WebGISMapManager {
 
       this.markerClusterGroup.addLayer(marker);
     });
+
+    this.renderPendingDensityHeatmap(claims);
+  }
+
+  /**
+   * Lightweight "pending claims density" heatmap rendered as graduated,
+   * softly-blurred circle markers sized/colored by pending backlog per district.
+   */
+  renderPendingDensityHeatmap(claims) {
+    if (!this.heatmapLayerGroup) return;
+    this.heatmapLayerGroup.clearLayers();
+
+    const pendingByDistrict = new Map();
+    claims.forEach((c) => {
+      if (c.status === "Title Conferred" || c.status === "Rejected") return;
+      const key = c.district;
+      if (!pendingByDistrict.has(key)) pendingByDistrict.set(key, { count: 0, center: null });
+      const entry = pendingByDistrict.get(key);
+      entry.count += 1;
+      if (!entry.center) {
+        const district = this.activeDistricts.find((d) => d.name === c.district);
+        entry.center = district ? district.center : c.coordinates;
+      }
+    });
+
+    const maxCount = Math.max(1, ...[...pendingByDistrict.values()].map((v) => v.count));
+
+    pendingByDistrict.forEach(({ count, center }) => {
+      if (!center) return;
+      const intensity = count / maxCount;
+      const radius = 15000 + intensity * 45000;
+
+      // Layered glow rings for a soft heat-blob effect (no extra plugin dependency)
+      [1, 0.65, 0.35].forEach((scale, idx) => {
+        this.heatmapLayerGroup.addLayer(
+          L.circle(center, {
+            radius: radius * scale,
+            stroke: false,
+            fillColor: intensity > 0.66 ? '#f43f5e' : intensity > 0.33 ? '#f59e0b' : '#eab308',
+            fillOpacity: 0.22 - idx * 0.05,
+            interactive: idx === 0
+          }).bindTooltip(
+            `<strong>${count} pending claim${count === 1 ? '' : 's'}</strong> in this district`,
+            { sticky: true, className: 'leaflet-tooltip-dark' }
+          )
+        );
+      });
+    });
   }
 
   setLayerVisibility(layerKey, isVisible) {
     this.visibleLayers[layerKey] = isVisible;
+    if (!this.map) return;
 
     if (layerKey === "districts") {
       if (isVisible) this.map.addLayer(this.districtLayersGroup);
@@ -300,16 +448,21 @@ export class WebGISMapManager {
     } else if (layerKey === "forestCover") {
       if (isVisible) this.map.addLayer(this.forestLayersGroup);
       else this.map.removeLayer(this.forestLayersGroup);
+    } else if (layerKey === "heatmap") {
+      if (isVisible) this.map.addLayer(this.heatmapLayerGroup);
+      else this.map.removeLayer(this.heatmapLayerGroup);
     } else {
       this.updateClaimsMarkers(this.activeClaims);
     }
   }
 
   fitAll() {
+    if (!this.map) return;
     this.map.flyTo([21.50, 82.50], 6, { duration: 1.2 });
   }
 
   focusDistrict(districtName) {
+    if (!this.map) return;
     const dist = this.activeDistricts.find((d) => d.name === districtName);
     if (dist) {
       this.map.flyTo(dist.center, dist.zoom || 9, { duration: 1.2 });
@@ -317,6 +470,7 @@ export class WebGISMapManager {
   }
 
   focusAnomalyHotspots() {
+    if (!this.map) return;
     const anomalousClaims = this.activeClaims.filter((c) => c.hasAnomaly);
     if (anomalousClaims.length > 0) {
       const bounds = L.latLngBounds(anomalousClaims.map((c) => c.coordinates));

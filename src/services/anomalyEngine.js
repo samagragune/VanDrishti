@@ -204,7 +204,7 @@ export function computeDistrictAnalytics(claims, districts) {
     const rejectionFactor = total > 0 ? rejected / total : 0;
 
     const vulnerabilityScore = Math.round(
-      (anomalyRatio * 45 + delayFactor * 35 + rejectionFactor * 20) * 100
+      anomalyRatio * 45 + delayFactor * 35 + rejectionFactor * 20
     );
 
     let riskTier = "LOW";
