@@ -1,0 +1,68 @@
+{
+  "type": "FeatureCollection",
+  "generator": "VanDrishti mock boundary (derived from district centroid/extent reference points)",
+  "copyright": "Mock administrative boundary for demonstration purposes only. Not survey-grade.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Mayurbhanj",
+        "name:en": "Mayurbhanj",
+        "state": "Odisha",
+        "boundary": "administrative",
+        "admin_level": "6"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              86.12,
+              22.45
+            ],
+            [
+              86.45,
+              22.55
+            ],
+            [
+              86.85,
+              22.48
+            ],
+            [
+              87.15,
+              22.25
+            ],
+            [
+              87.1,
+              21.8
+            ],
+            [
+              86.75,
+              21.45
+            ],
+            [
+              86.3,
+              21.35
+            ],
+            [
+              85.8,
+              21.5
+            ],
+            [
+              85.75,
+              21.9
+            ],
+            [
+              85.9,
+              22.2
+            ],
+            [
+              86.12,
+              22.45
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

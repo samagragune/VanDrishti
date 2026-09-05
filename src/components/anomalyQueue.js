@@ -24,6 +24,9 @@ export class AnomalyQueueController {
     const areaCount = claims.filter((c) => c.anomalies.some((a) => a.type === "AREA_EXCEEDED")).length;
     const rejectionCount = claims.filter((c) => c.anomalies.some((a) => a.type === "HIGH_REJECTION")).length;
     const otfdCount = claims.filter((c) => c.anomalies.some((a) => a.type === "OTFD_PROOF_GAP")).length;
+    const pipelineCount = claims.filter((c) => c.anomalies.some((a) => a.type === "PIPELINE_OUTLIER")).length;
+    const gsRejectionCount = claims.filter((c) => c.anomalies.some((a) => a.type === "GRAM_SABHA_REJECTION_OUTLIER")).length;
+    const landOutlierCount = claims.filter((c) => c.anomalies.some((a) => a.type === "LAND_AREA_OUTLIER")).length;
 
     document.getElementById("pill-count-all").innerText = allCount;
     document.getElementById("pill-count-sla").innerText = slaCount;
@@ -31,6 +34,9 @@ export class AnomalyQueueController {
     document.getElementById("pill-count-area").innerText = areaCount;
     document.getElementById("pill-count-rejection").innerText = rejectionCount;
     document.getElementById("pill-count-otfd").innerText = otfdCount;
+    document.getElementById("pill-count-pipeline").innerText = pipelineCount;
+    document.getElementById("pill-count-gs-rejection").innerText = gsRejectionCount;
+    document.getElementById("pill-count-land-outlier").innerText = landOutlierCount;
   }
 
   setFilter(type) {

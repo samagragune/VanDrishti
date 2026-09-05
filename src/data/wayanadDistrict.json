@@ -1,0 +1,52 @@
+{
+  "type": "FeatureCollection",
+  "generator": "VanDrishti mock boundary (derived from district centroid/extent reference points)",
+  "copyright": "Mock administrative boundary for demonstration purposes only. Not survey-grade.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Wayanad",
+        "name:en": "Wayanad",
+        "state": "Kerala",
+        "boundary": "administrative",
+        "admin_level": "6"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              75.95,
+              11.95
+            ],
+            [
+              76.35,
+              11.92
+            ],
+            [
+              76.42,
+              11.65
+            ],
+            [
+              76.25,
+              11.45
+            ],
+            [
+              75.9,
+              11.45
+            ],
+            [
+              75.85,
+              11.7
+            ],
+            [
+              75.95,
+              11.95
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

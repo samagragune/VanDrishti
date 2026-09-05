@@ -2,6 +2,7 @@
 // Official Forest Rights Act (FRA 2006) WebGIS & Decision Support Portal
 
 import { NATIONWIDE_FRA_DATA, NATIONWIDE_SUMMARY } from '../data/nationwideData.js';
+import { ShaderBackground } from './shaderBackground.js';
 
 export class HomePortalView {
   constructor(containerId, onNavigateCallback, onSelectDistrictCallback) {
@@ -9,6 +10,7 @@ export class HomePortalView {
     this.onNavigate = onNavigateCallback;
     this.onSelectDistrict = onSelectDistrictCallback;
     this.activeSlide = 0;
+    this.shaderBackground = null;
   }
 
   render() {
@@ -18,50 +20,52 @@ export class HomePortalView {
     container.innerHTML = `
       <div class="portal-home-container clean-central-mode">
         
-        <!-- Central Minimalist Hero Section -->
-        <div class="central-hero-wrap">
-          <div class="central-brand-emblem">
-            <img src="/vandrishti-logo.png" alt="VanDrishti Emblem" class="central-logo-img" />
-          </div>
-
-          <h1 class="central-title">VanDrishti</h1>
-          <p class="central-subtitle">
-            Forest Rights Act (FRA 2006) Geospatial Cadastral Intelligence & AI Statutory Decision Platform
-          </p>
-
-          <!-- 3 Distanced Action Buttons -->
-          <div class="central-action-row">
-            <button class="btn btn-central-primary" data-nav="map-view">
-              <i class="fa-solid fa-map-location-dot"></i>
-              <span>Launch WebGIS Satellite Map</span>
-            </button>
-            <button class="btn btn-central-secondary" data-nav="dashboard-view">
-              <i class="fa-solid fa-chart-line"></i>
-              <span>Executive Analytics</span>
-            </button>
-            <button class="btn btn-central-accent" data-nav="anomaly-view">
-              <i class="fa-solid fa-triangle-exclamation"></i>
-              <span>Anomaly Triage Queue</span>
-            </button>
-          </div>
-
-          <!-- Minimal Live Stat Strip -->
-          <div class="central-stats-strip">
-            <div class="central-stat-pill">
-              <span class="val">${(NATIONWIDE_SUMMARY.totalClaimsReceived / 100000).toFixed(2)} Lakh</span>
-              <span class="lbl">Claims Processed</span>
+        <!-- Central Minimalist Hero Section (ambient WebGL gradient mounts behind .hero-content) -->
+        <div class="central-hero-wrap" id="hero-shader-mount">
+          <div class="hero-content">
+            <div class="central-brand-emblem">
+              <img src="/vandrishti-logo.png" alt="VanDrishti Emblem" class="central-logo-img" />
             </div>
-            <div class="central-stat-pill success">
-              <span class="val">${(NATIONWIDE_SUMMARY.totalTitlesConferred / 100000).toFixed(2)} Lakh</span>
-              <span class="lbl">Titles Conferred</span>
+
+            <h1 class="central-title">VanDrishti</h1>
+            <p class="central-subtitle">
+              Forest Rights Act (FRA 2006) Geospatial Cadastral Intelligence & AI Statutory Decision Platform
+            </p>
+
+            <!-- 3 Distanced Action Buttons -->
+            <div class="central-action-row">
+              <button class="btn btn-central-primary" data-nav="map-view">
+                <i class="fa-solid fa-map-location-dot"></i>
+                <span>Launch WebGIS Satellite Map</span>
+              </button>
+              <button class="btn btn-central-secondary" data-nav="dashboard-view">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Executive Analytics</span>
+              </button>
+              <button class="btn btn-central-accent" data-nav="anomaly-view">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Anomaly Triage Queue</span>
+              </button>
             </div>
-            <div class="central-stat-pill info">
-              <span class="val">${(NATIONWIDE_SUMMARY.totalExtentDistributedHa / 100000).toFixed(2)} Lakh Ha</span>
-              <span class="lbl">Forest Land Titled</span>
-            </div>
-            <div class="central-stat-pill accent">
-              <span class="val">${NATIONWIDE_SUMMARY.allIndiaRecognitionRate}%</span>
-              <span class="lbl">Recognition Rate</span>
+
+            <!-- Minimal Live Stat Strip -->
+            <div class="central-stats-strip">
+              <div class="central-stat-pill">
+                <span class="val">${(NATIONWIDE_SUMMARY.totalClaimsReceived / 100000).toFixed(2)} Lakh</span>
+                <span class="lbl">Claims Processed</span>
+              </div>
+              <div class="central-stat-pill success">
+                <span class="val">${(NATIONWIDE_SUMMARY.totalTitlesConferred / 100000).toFixed(2)} Lakh</span>
+                <span class="lbl">Titles Conferred</span>
+              </div>
+              <div class="central-stat-pill info">
+                <span class="val">${(NATIONWIDE_SUMMARY.totalExtentDistributedHa / 100000).toFixed(2)} Lakh Ha</span>
+                <span class="lbl">Forest Land Titled</span>
+              </div>
+              <div class="central-stat-pill accent">
+                <span class="val">${NATIONWIDE_SUMMARY.allIndiaRecognitionRate}%</span>
+                <span class="lbl">Recognition Rate</span>
+              </div>
             </div>
           </div>
         </div>
@@ -195,6 +199,30 @@ export class HomePortalView {
     `;
 
     this.attachEventListeners();
+    this.initShaderBackground();
+  }
+
+  initShaderBackground() {
+    // Ambient animated gradient behind the hero. Purely decorative: any WebGL
+    // failure (unsupported browser, blocked context) is swallowed silently and
+    // the hero simply renders on its normal solid background.
+    if (this.shaderBackground) {
+      this.shaderBackground.destroy();
+      this.shaderBackground = null;
+    }
+    const mount = document.getElementById("hero-shader-mount");
+    if (!mount) return;
+    try {
+      this.shaderBackground = new ShaderBackground(mount, {
+        bg: "#121b10",
+        colors: ["#ACC8A2", "#78a873", "#2b3e27", "#0c130a"],
+        speed: 1.2,
+        grain: 0.22
+      });
+      this.shaderBackground.init();
+    } catch (err) {
+      console.warn("Ambient shader background failed to initialize:", err);
+    }
   }
 
   renderNationwideRows(data) {

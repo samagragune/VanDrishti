@@ -1,4 +1,8 @@
 import thaneGeoJSON from './thaneDistrict.json';
+import gadchiroliGeoJSON from './gadchiroliDistrict.json';
+import bastarGeoJSON from './bastarDistrict.json';
+import mayurbhanjGeoJSON from './mayurbhanjDistrict.json';
+import wayanadGeoJSON from './wayanadDistrict.json';
 
 // Comprehensive All-India District Boundaries & Geometries for Forest Rights Act (FRA) Monitoring
 // Covers 80+ Key Forest & Tribal Districts across all 28 States & UTs nationwide
@@ -29,6 +33,7 @@ export const DISTRICT_REGIONS = [
     tribalPct: 38.7,
     pvtgGroups: ["Madia Gond", "Kolam", "Pardhan"],
     bounds: [[18.70, 79.70], [18.70, 80.90], [20.80, 80.90], [20.80, 79.70]],
+    geoJson: gadchiroliGeoJSON,
     polygon: [[20.75, 80.05], [20.70, 80.65], [20.10, 80.85], [19.20, 80.80], [18.75, 80.35], [18.80, 79.85], [19.50, 79.75], [20.30, 79.80], [20.75, 80.05]]
   },
   {
@@ -259,6 +264,7 @@ export const DISTRICT_REGIONS = [
     tribalPct: 65.2,
     pvtgGroups: ["Abujh Maria", "Maria Gond", "Muria", "Bhatra", "Halba"],
     bounds: [[18.50, 81.20], [18.50, 82.35], [19.65, 82.35], [19.65, 81.20]],
+    geoJson: bastarGeoJSON,
     polygon: [[19.60, 81.65], [19.62, 82.15], [19.25, 82.30], [18.75, 82.10], [18.55, 81.80], [18.65, 81.30], [19.10, 81.25], [19.45, 81.40], [19.60, 81.65]]
   },
   {
@@ -321,6 +327,7 @@ export const DISTRICT_REGIONS = [
     tribalPct: 58.7,
     pvtgGroups: ["Lodha", "Birhor", "Hill Kharia", "Santhal"],
     bounds: [[21.28, 85.67], [21.28, 87.18], [22.56, 87.18], [22.56, 85.67]],
+    geoJson: mayurbhanjGeoJSON,
     polygon: [[22.45, 86.12], [22.55, 86.45], [22.48, 86.85], [22.25, 87.15], [21.80, 87.10], [21.45, 86.75], [21.35, 86.30], [21.50, 85.80], [21.90, 85.75], [22.20, 85.90], [22.45, 86.12]]
   },
   {
@@ -467,6 +474,7 @@ export const DISTRICT_REGIONS = [
     tribalPct: 18.5,
     pvtgGroups: ["Kattunayakan (PVTG)", "Paniya", "Kurichiya", "Mullu Kurumba"],
     bounds: [[11.40, 75.80], [11.40, 76.45], [12.00, 76.45], [12.00, 75.80]],
+    geoJson: wayanadGeoJSON,
     polygon: [[11.95, 75.95], [11.92, 76.35], [11.65, 76.42], [11.45, 76.25], [11.45, 75.90], [11.70, 75.85], [11.95, 75.95]]
   },
   {

@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "generator": "VanDrishti mock boundary (derived from district centroid/extent reference points)",
+  "copyright": "Mock administrative boundary for demonstration purposes only. Not survey-grade.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Gadchiroli",
+        "name:en": "Gadchiroli",
+        "state": "Maharashtra",
+        "boundary": "administrative",
+        "admin_level": "6"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              80.05,
+              20.75
+            ],
+            [
+              80.65,
+              20.7
+            ],
+            [
+              80.85,
+              20.1
+            ],
+            [
+              80.8,
+              19.2
+            ],
+            [
+              80.35,
+              18.75
+            ],
+            [
+              79.85,
+              18.8
+            ],
+            [
+              79.75,
+              19.5
+            ],
+            [
+              79.8,
+              20.3
+            ],
+            [
+              80.05,
+              20.75
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}

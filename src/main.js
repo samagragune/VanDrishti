@@ -2,12 +2,13 @@
 
 import { DISTRICT_REGIONS } from './data/districtBoundaries.js';
 import { generateMasterClaimsDataset } from './data/claimsData.js';
-import { runAnomalyDetection, computeDistrictAnalytics } from './services/anomalyEngine.js';
+import { runAnomalyDetection, computeDistrictAnalytics, computeStateAnalytics } from './services/anomalyEngine.js';
 import { FRAAIService } from './services/aiService.js';
 import { ExportService } from './services/exportService.js';
 
 import { WebGISMapManager } from './components/mapManager.js';
 import { DashboardViewController } from './components/dashboardView.js';
+import { DecisionSupportController } from './components/decisionSupportView.js';
 import { AnomalyQueueController } from './components/anomalyQueue.js';
 import { ClaimModalController } from './components/claimModal.js';
 import { AICopilotController } from './components/aiCopilot.js';
@@ -35,6 +36,7 @@ class FRAVisionApp {
     this.aiService = new FRAAIService();
     this.mapManager = null;
     this.dashboardController = null;
+    this.decisionSupportController = null;
     this.anomalyQueueController = null;
     this.claimModalController = null;
     this.copilotController = null;
@@ -86,6 +88,17 @@ class FRAVisionApp {
 
     this.dashboardController = new DashboardViewController((districtName, state) => {
       this.selectDistrict(districtName, state);
+    });
+
+    this.decisionSupportController = new DecisionSupportController((stateName) => {
+      this.selectedState = stateName;
+      this.selectedDistrict = "ALL";
+      const stateSelect = document.getElementById("filter-state");
+      if (stateSelect) stateSelect.value = stateName;
+      this.populateDistrictDropdown();
+      this.mapManager.fitAll();
+      this.switchView("map-view");
+      this.renderAllViews();
     });
 
     this.anomalyQueueController = new AnomalyQueueController(
@@ -169,6 +182,9 @@ class FRAVisionApp {
       this.selectedDistrict,
       this.selectedState
     );
+
+    // Update State-Wise Decision Support Panel (always nationwide, so states remain comparable)
+    this.decisionSupportController.render(computeStateAnalytics(this.districtAnalytics));
 
     // Update Anomaly Queue View
     this.anomalyQueueController.renderQueue(filteredClaims);

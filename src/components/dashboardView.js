@@ -144,6 +144,9 @@ export class DashboardViewController {
     const areaCount = claims.filter((c) => c.anomalies.some((a) => a.type === "AREA_EXCEEDED")).length;
     const rejectCount = claims.filter((c) => c.anomalies.some((a) => a.type === "HIGH_REJECTION")).length;
     const otfdCount = claims.filter((c) => c.anomalies.some((a) => a.type === "OTFD_PROOF_GAP")).length;
+    const pipelineCount = claims.filter((c) => c.anomalies.some((a) => a.type === "PIPELINE_OUTLIER")).length;
+    const gsRejectionCount = claims.filter((c) => c.anomalies.some((a) => a.type === "GRAM_SABHA_REJECTION_OUTLIER")).length;
+    const landOutlierCount = claims.filter((c) => c.anomalies.some((a) => a.type === "LAND_AREA_OUTLIER")).length;
 
     this.chartAnomalies = new Chart(canvas, {
       type: 'doughnut',
@@ -153,12 +156,15 @@ export class DashboardViewController {
           'Spatial Overlap',
           'Area >4 Ha Limit',
           'Rejection Review',
-          'OTFD Proof Gap'
+          'OTFD Proof Gap',
+          'AI Pipeline Outlier',
+          'AI Rejection Outlier',
+          'AI Land Area Outlier'
         ],
         datasets: [
           {
-            data: [slaCount, overlapCount, areaCount, rejectCount, otfdCount],
-            backgroundColor: ['#f59e0b', '#f43f5e', '#a855f7', '#ef4444', '#06b6d4'],
+            data: [slaCount, overlapCount, areaCount, rejectCount, otfdCount, pipelineCount, gsRejectionCount, landOutlierCount],
+            backgroundColor: ['#f59e0b', '#f43f5e', '#a855f7', '#ef4444', '#06b6d4', '#0ea5e9', '#e11d48', '#c4a7e7'],
             borderWidth: 0
           }
         ]

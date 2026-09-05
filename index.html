@@ -46,6 +46,10 @@
           <i class="fa-solid fa-chart-line"></i>
           <span>Analytics</span>
         </button>
+        <button class="nav-tab" data-view="decision-support-view" title="State-Wise Decision Support">
+          <i class="fa-solid fa-diagram-project"></i>
+          <span>Decision</span>
+        </button>
         <button class="nav-tab" data-view="anomaly-view" title="Anomaly Triage Queue">
           <i class="fa-solid fa-shield-halved"></i>
           <span>Triage</span>
@@ -423,6 +427,49 @@
         </div>
       </section>
 
+      <!-- VIEW 2.5: State-Wise Decision Support Panel -->
+      <section id="decision-support-view" class="workspace-view">
+        <div class="decision-support-container">
+          <div class="page-header-banner">
+            <div>
+              <h2><i class="fa-solid fa-diagram-project text-emerald"></i> State-Wise Decision Support Panel</h2>
+              <p class="text-muted">AI-aggregated state-level progress, statutory recognition velocity, and vulnerability ranking derived from live district analytics. Click any state to drill down.</p>
+            </div>
+          </div>
+
+          <!-- AI-Generated Decision Insights -->
+          <div class="insights-row" id="decision-support-insights">
+            <!-- Populated dynamically -->
+          </div>
+
+          <div class="decision-support-grid">
+            <div class="chart-card flex-1">
+              <div class="chart-header">
+                <div>
+                  <h3>Top States by Recognition Rate</h3>
+                  <p class="text-muted">Title conferment efficiency, ranked</p>
+                </div>
+              </div>
+              <div class="chart-canvas-container tall">
+                <canvas id="chart-state-progress"></canvas>
+              </div>
+            </div>
+
+            <div class="chart-card flex-2">
+              <div class="chart-header">
+                <div>
+                  <h3>State-Wise Progress</h3>
+                  <p class="text-muted">Aggregated totals, disposal rate, and AI vulnerability tier per state</p>
+                </div>
+              </div>
+              <div class="state-progress-list" id="state-progress-list">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <!-- VIEW 3: Anomaly Triage Queue -->
       <section id="anomaly-view" class="workspace-view">
         <div class="anomaly-container">
@@ -449,6 +496,9 @@
             <button class="pill-filter" data-anomaly-type="AREA_EXCEEDED"><i class="fa-solid fa-ruler-combined text-purple"></i> Area > 4 Ha Statutory Limit (<span id="pill-count-area">0</span>)</button>
             <button class="pill-filter" data-anomaly-type="HIGH_REJECTION"><i class="fa-solid fa-ban text-rose"></i> Abnormal Rejection Outlier (<span id="pill-count-rejection">0</span>)</button>
             <button class="pill-filter" data-anomaly-type="OTFD_PROOF_GAP"><i class="fa-solid fa-file-circle-xmark text-cyan"></i> OTFD 75-Yr Proof Gap (<span id="pill-count-otfd">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="PIPELINE_OUTLIER"><i class="fa-solid fa-chart-line text-cyan"></i> AI Pipeline Outlier (<span id="pill-count-pipeline">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="GRAM_SABHA_REJECTION_OUTLIER"><i class="fa-solid fa-chart-column text-rose"></i> AI Rejection Outlier (<span id="pill-count-gs-rejection">0</span>)</button>
+            <button class="pill-filter" data-anomaly-type="LAND_AREA_OUTLIER"><i class="fa-solid fa-ruler text-purple"></i> AI Land Area Outlier (<span id="pill-count-land-outlier">0</span>)</button>
           </div>
 
           <!-- Anomaly Table -->

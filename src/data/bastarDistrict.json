@@ -1,0 +1,60 @@
+{
+  "type": "FeatureCollection",
+  "generator": "VanDrishti mock boundary (derived from district centroid/extent reference points)",
+  "copyright": "Mock administrative boundary for demonstration purposes only. Not survey-grade.",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Bastar",
+        "name:en": "Bastar",
+        "state": "Chhattisgarh",
+        "boundary": "administrative",
+        "admin_level": "6"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [
+              81.65,
+              19.6
+            ],
+            [
+              82.15,
+              19.62
+            ],
+            [
+              82.3,
+              19.25
+            ],
+            [
+              82.1,
+              18.75
+            ],
+            [
+              81.8,
+              18.55
+            ],
+            [
+              81.3,
+              18.65
+            ],
+            [
+              81.25,
+              19.1
+            ],
+            [
+              81.4,
+              19.45
+            ],
+            [
+              81.65,
+              19.6
+            ]
+          ]
+        ]
+      }
+    }
+  ]
+}
